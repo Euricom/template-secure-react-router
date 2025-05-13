@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Use as much shadcn components as possible, use the folder /app/components as much as possible this also contains custom components. Reuse these as much as possible.
+Use as many of the predefined colors as possible. When you invent a new color let me know!
+You are not allowed to make changes in /app/components/ui this contains shadcn components, if you want to install more components let me know!
+
+When doing validation use ZOD
+
+We are using react router v7 in framework mode (previously remix)
+Dont use @remix-run/react use react-router for imports
+
+Data connections use prisma
+
+Better-auth is used for authentication
+
+Always show dates in dd/mm/yyyy in the FE, use date util in /app/lib
+
+When creating crud routes using following structure
+- {object-name}s.tsx
+- {object-name}.create.tsx
+- {object-name}.edit.tsx
+- {object-name}.detail.tsx
