@@ -11,6 +11,13 @@ export const organizationRoutes = [
       route("create", "./routes/onboarding.create.tsx"),
       route("join", "./routes/onboarding.join.tsx"),
     ]),
+    route("/onboarding/join/:inviteId", "./routes/onboarding.join.byId.tsx"),
     route("/", "./routes/general.tsx"),
+    route("/members", "./routes/members.tsx", [
+      route(":memberId/remove", "./routes/members.remove.tsx"),
+      route(":memberId/set-role", "./routes/members.setRole.tsx"),
+      route("invite", "./routes/members.invite.tsx"),
+      route("invite/:inviteId/cancel", "./routes/members.invite.cancel.tsx"),
+    ]),
   ]),
 ] satisfies RouteConfig;

@@ -87,7 +87,22 @@ export const options = {
       prefix: process.env.NODE_ENV === "development" ? undefined : ("host" as "host"),
     },
   },
-  plugins: [admin(), organization()],
+  plugins: [
+    admin(),
+    organization({
+      async sendInvitationEmail(data) {
+        const inviteLink = `http://localhost:5173/app/organization/onboarding/join/${data.id}`;
+        const email = data.email;
+        const invitedBy = data.inviter.user.name;
+        const organizationName = data.organization.name;
+
+        console.log("Sending invitation email to", email);
+        console.log("Invite link:", inviteLink);
+        console.log("Invited by:", invitedBy);
+        console.log("Organization name:", organizationName);
+      },
+    }),
+  ],
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth({
