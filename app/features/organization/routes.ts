@@ -9,6 +9,7 @@ export const organizationRoutes = [
     route("/select", "./routes/select.tsx"),
     route("/onboarding", "./routes/onboarding.tsx", [
       route("create", "./routes/onboarding.create.tsx"),
+      route("join", "./routes/onboarding.join.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

@@ -8,6 +8,7 @@ import {
 } from "react-router";
 import { auth } from "~/lib/auth";
 import { Plus } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogTitle } from "~/components/ui/alert-dialog";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const organizations = await auth.api.listOrganizations({
@@ -38,30 +39,31 @@ export default function Select() {
   const { organizations } = useLoaderData<typeof loader>();
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Select Organization</h1>
+    <AlertDialog open={true}>
+      <AlertDialogContent>
+        <AlertDialogTitle>Select Organization</AlertDialogTitle>
+        <div className="grid gap-4">
+          <Link
+            to="/app/organization/onboarding"
+            className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <Plus className="w-5 h-5" />
+            Add Other Organization
+          </Link>
 
-      <div className="grid gap-4">
-        <Link
-          to="/app/organization/onboarding"
-          className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          Add Other Organization
-        </Link>
-
-        {organizations.map((organization) => (
-          <Form key={organization.id} method="post">
-            <input type="hidden" name="organizationId" value={organization.id} />
-            <button
-              type="submit"
-              className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              {organization.name}
-            </button>
-          </Form>
-        ))}
-      </div>
-    </div>
+          {organizations.map((organization) => (
+            <Form key={organization.id} method="post">
+              <input type="hidden" name="organizationId" value={organization.id} />
+              <button
+                type="submit"
+                className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                {organization.name}
+              </button>
+            </Form>
+          ))}
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

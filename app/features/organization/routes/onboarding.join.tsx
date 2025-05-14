@@ -64,7 +64,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export default function OnboardingCreate() {
+export default function OnboardingJoin() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -72,28 +72,11 @@ export default function OnboardingCreate() {
   return (
     <Card className="mx-auto w-full max-w-md">
       <CardHeader>
-        <CardTitle>Create a new organization</CardTitle>
-        <CardDescription>Enter a name for your new organization.</CardDescription>
+        <CardTitle>Its currently under construction</CardTitle>
+        <CardDescription>
+          We are currently working on this feature. Please check back later.
+        </CardDescription>
       </CardHeader>
-      <form method="post" autoComplete="off">
-        <CardContent className="space-y-4 py-4">
-          <InputWithLabel
-            label="Name"
-            id="name"
-            name="name"
-            error={actionData?.errors?.name?.[0]}
-            autoFocus
-          />
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2 items-stretch">
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </Button>
-          {actionData?.error && (
-            <div className="text-destructive text-sm text-center">{actionData.error}</div>
-          )}
-        </CardFooter>
-      </form>
     </Card>
   );
 }
