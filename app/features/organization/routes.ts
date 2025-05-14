@@ -11,5 +11,6 @@ export const organizationRoutes = [
       route("create", "./routes/onboarding.create.tsx"),
       route("join", "./routes/onboarding.join.tsx"),
     ]),
+    route("/", "./routes/general.tsx"),
   ]),
 ] satisfies RouteConfig;

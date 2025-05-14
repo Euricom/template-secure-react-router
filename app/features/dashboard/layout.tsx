@@ -13,7 +13,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "~/components/ui/s
 import { auth } from "~/lib/auth";
 import { Toaster } from "~/components/ui/sonner";
 import type { Route } from "./+types/layout";
-import { Package, type LucideIcon } from "lucide-react";
+import { Package, Users, type LucideIcon } from "lucide-react";
 import { Settings2 } from "lucide-react";
 import { useMemo } from "react";
 import type { Organization } from "@prisma/client";
@@ -42,6 +42,29 @@ const navMain: NavItem[] = [
       },
     ],
   },
+  {
+    title: "Organization",
+    url: "/app/organization",
+    icon: Users,
+    items: [
+      {
+        title: "General",
+        url: "/app/organization/",
+      },
+      {
+        title: "Members",
+        url: "/app/organization/members",
+      },
+      {
+        title: "Access",
+        url: "/app/organization/access",
+      },
+      {
+        title: "Teams",
+        url: "/app/organization/teams",
+      },
+    ],
+  },
 ];
 
 const navAdmin: NavItem[] = [
@@ -56,10 +79,6 @@ const navAdmin: NavItem[] = [
       },
       {
         title: "Roles",
-        url: "#",
-      },
-      {
-        title: "Permissions",
         url: "#",
       },
     ],
