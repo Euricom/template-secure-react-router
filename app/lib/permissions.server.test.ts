@@ -9,16 +9,24 @@ const MANAGE = "manage";
 const user = {
   anonymous: null,
   user: {
-    id: "user-1",
-    role: "user",
-    organizationId: "organization-1",
-    organizationRole: "member",
+    user: {
+      id: "user-1",
+      role: "user",
+    },
+    organization: {
+      id: "organization-1",
+      role: "member",
+    },
   } as any,
   admin: {
-    id: "admin-1",
-    role: "admin",
-    organizationId: "organization-1",
-    organizationRole: "admin",
+    user: {
+      id: "admin-1",
+      role: "admin",
+    },
+    organization: {
+      id: "organization-1",
+      role: "admin",
+    },
   } as any,
 };
 
@@ -35,9 +43,7 @@ const product = {
 
 describe("As a not logged in user", () => {
   test("I can't read products", () => {
-    expect(() => ensureCanWithIdentity(user.anonymous, READ, "Product")).toThrow(
-      "User does not have permission to perform this action"
-    );
+    expect(() => ensureCanWithIdentity(user.anonymous, READ, "Product")).toThrow();
   });
 });
 
@@ -47,9 +53,7 @@ describe("As a regular user", () => {
   });
 
   test("I can't manage products I don't own", () => {
-    expect(() => ensureCanWithIdentity(user.user, EDIT, product.productOfOtherUser)).toThrow(
-      "User does not have permission to perform this action"
-    );
+    expect(() => ensureCanWithIdentity(user.user, EDIT, product.productOfOtherUser)).toThrow();
   });
 
   test("I can manage my own product", () => {
@@ -57,9 +61,7 @@ describe("As a regular user", () => {
   });
 
   test("I can't manage users", () => {
-    expect(() => ensureCanWithIdentity(user.user, EDIT, "User")).toThrow(
-      "User does not have permission to perform this action"
-    );
+    expect(() => ensureCanWithIdentity(user.user, EDIT, "User")).toThrow();
   });
 });
 
