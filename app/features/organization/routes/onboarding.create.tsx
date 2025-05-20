@@ -12,20 +12,19 @@ import {
   CardFooter,
 } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
+import { getUserInformation } from "~/lib/identity.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 
 const onboardingSchema = z.object({
   name: z.string().min(1, "Name is required"),
 });
 
 export async function action({ request }: ActionFunctionArgs) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "create", "Organization");
+
   const formData = await request.formData();
   const name = formData.get("name") as string;
-  const session = await auth.api.getSession({ headers: request.headers });
-
-  if (!session) {
-    return redirect("/app/organization");
-  }
-
   try {
     const validatedData = onboardingSchema.parse({ name });
 
@@ -47,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
       body: {
         name: validatedData.name,
         slug,
-        userId: session.user.id,
+        userId: identity.user.id,
       },
     });
 

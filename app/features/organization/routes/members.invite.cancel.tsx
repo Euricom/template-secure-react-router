@@ -16,6 +16,8 @@ import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
 import type { Route } from "./+types/members";
+import { getUserInformation } from "~/lib/identity.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 
 export async function action({
   request,
@@ -24,15 +26,13 @@ export async function action({
   request: Request;
   params: { inviteId: string };
 }) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "cancel", "Organization:Members:Invite");
+
   const inviteId = params.inviteId;
 
   if (!inviteId) {
     return { success: false, message: "Invitation ID is required" };
-  }
-
-  const user = await auth.api.getSession({ headers: request.headers });
-  if (!user) {
-    return redirect("/login");
   }
 
   await auth.api.cancelInvitation({
@@ -45,7 +45,10 @@ export async function action({
   return { success: true, message: "Invitation cancelled successfully" };
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "cancel", "Organization:Members:Invite");
+
   const inviteId = params.inviteId;
 
   if (!inviteId) {

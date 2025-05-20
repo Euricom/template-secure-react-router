@@ -28,23 +28,24 @@ import {
 } from "~/components/ui/alert-dialog";
 import { useState } from "react";
 import { auth } from "~/lib/auth";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 
 const orgNameSchema = z.object({
   name: z.string().min(1, "Name is required"),
 });
 
 export async function action({ request }: ActionFunctionArgs) {
+  const identity = await getUserInformation(request);
+
   const formData = await request.formData();
   const intent = formData.get("intent");
   const name = formData.get("name") as string | undefined;
   const organizationId = formData.get("organizationId") as string;
-  const session = await auth.api.getSession({ headers: request.headers });
-
-  if (!session) {
-    return redirect("/login");
-  }
 
   if (intent === "edit") {
+    ensureCanWithIdentity(identity, "update", "Organization");
+
     try {
       const validated = orgNameSchema.parse({ name });
       // TODO: Replace with actual updateOrganization API if available
@@ -70,7 +71,8 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (intent === "delete") {
-    // TODO: Replace with actual deleteOrganization API if available
+    ensureCanWithIdentity(identity, "delete", "Organization");
+
     if (typeof auth.api.deleteOrganization !== "function") {
       return { error: "Organization delete API not implemented" };
     }
@@ -87,15 +89,13 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) {
-    return redirect("/login");
-  }
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "read", "Organization");
 
   const activeOrg = await auth.api.getFullOrganization({
     headers: request.headers,
     params: {
-      organizationId: session.session.activeOrganizationId,
+      organizationId: identity.organization.id,
     },
   });
   return { activeOrg };

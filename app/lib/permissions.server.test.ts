@@ -1,5 +1,5 @@
 import { expect, describe, test } from "vitest";
-import { ensureCan } from "./permissions.server";
+import { ensureCan, ensureCanWithIdentity } from "./permissions.server";
 import { subject } from "@casl/ability";
 
 const READ = "read";
@@ -11,11 +11,15 @@ const user = {
   user: {
     id: "user-1",
     role: "user",
-  },
+    organizationId: "organization-1",
+    organizationRole: "member",
+  } as any,
   admin: {
     id: "admin-1",
     role: "admin",
-  },
+    organizationId: "organization-1",
+    organizationRole: "admin",
+  } as any,
 };
 
 const product = {
@@ -31,7 +35,7 @@ const product = {
 
 describe("As a not logged in user", () => {
   test("I can't read products", () => {
-    expect(() => ensureCan(user.anonymous, READ, "Product")).toThrow(
+    expect(() => ensureCanWithIdentity(user.anonymous, READ, "Product")).toThrow(
       "User does not have permission to perform this action"
     );
   });
@@ -39,21 +43,21 @@ describe("As a not logged in user", () => {
 
 describe("As a regular user", () => {
   test("I can read products", () => {
-    expect(() => ensureCan(user.user, READ, "Product")).not.toThrow();
+    expect(() => ensureCanWithIdentity(user.user, READ, "Product")).not.toThrow();
   });
 
   test("I can't manage products I don't own", () => {
-    expect(() => ensureCan(user.user, EDIT, product.productOfOtherUser)).toThrow(
+    expect(() => ensureCanWithIdentity(user.user, EDIT, product.productOfOtherUser)).toThrow(
       "User does not have permission to perform this action"
     );
   });
 
   test("I can manage my own product", () => {
-    expect(() => ensureCan(user.user, MANAGE, product.productOfUser)).not.toThrow();
+    expect(() => ensureCanWithIdentity(user.user, MANAGE, product.productOfUser)).not.toThrow();
   });
 
   test("I can't manage users", () => {
-    expect(() => ensureCan(user.user, EDIT, "User")).toThrow(
+    expect(() => ensureCanWithIdentity(user.user, EDIT, "User")).toThrow(
       "User does not have permission to perform this action"
     );
   });
@@ -61,14 +65,14 @@ describe("As a regular user", () => {
 
 describe("As an admin user", () => {
   test("I can manage all products", () => {
-    expect(() => ensureCan(user.admin, EDIT, product.productOfUser)).not.toThrow();
+    expect(() => ensureCanWithIdentity(user.admin, EDIT, product.productOfUser)).not.toThrow();
   });
 
   test("I can manage users", () => {
-    expect(() => ensureCan(user.admin, EDIT, "User")).not.toThrow();
+    expect(() => ensureCanWithIdentity(user.admin, EDIT, "User")).not.toThrow();
   });
 
   test("I can read products", () => {
-    expect(() => ensureCan(user.admin, READ, "Product")).not.toThrow();
+    expect(() => ensureCanWithIdentity(user.admin, READ, "Product")).not.toThrow();
   });
 });

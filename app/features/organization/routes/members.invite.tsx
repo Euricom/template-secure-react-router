@@ -15,8 +15,13 @@ import { Dialog } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth";
 import { InputWithLabel } from "~/components/input-with-label";
+import { getUserInformation } from "~/lib/identity.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 
 export async function action({ request }: { request: Request }) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "create", "Organization:Members:Invite");
+
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const role = formData.get("role") as string;
@@ -35,7 +40,7 @@ export async function action({ request }: { request: Request }) {
     return { success: false, error: "Invalid role" };
   }
 
-  const response = await auth.api.createInvitation({
+  await auth.api.createInvitation({
     headers: request.headers,
     body: {
       email,

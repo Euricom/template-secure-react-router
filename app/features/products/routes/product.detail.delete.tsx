@@ -6,8 +6,8 @@ import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog
 import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import type { OutletContext } from "./product.detail";
-import { auth } from "~/lib/auth";
-import { ensureCan } from "~/lib/permissions.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 import { subject } from "@casl/ability";
 
 export async function action({
@@ -17,7 +17,9 @@ export async function action({
   request: Request;
   params: { productId: string };
 }) {
-  const user = await auth.api.getSession({ headers: request.headers });
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "delete", "Product");
+
   const product = await prisma.product.findUnique({
     where: { id: params.productId },
   });
@@ -26,7 +28,7 @@ export async function action({
     throw new Response("Product not found", { status: 404 });
   }
 
-  ensureCan(user?.user, "delete", subject("Product", product));
+  ensureCanWithIdentity(identity, "delete", subject("Product", product));
 
   try {
     await prisma.product.delete({

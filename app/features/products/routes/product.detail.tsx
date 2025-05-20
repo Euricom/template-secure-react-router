@@ -4,15 +4,15 @@ import { Header } from "~/components/header";
 import { formatDate } from "~/lib/date";
 import { Button } from "~/components/ui/button";
 import type { Route } from "./+types/product.detail";
-import { auth } from "~/lib/auth";
-import { ensureCan } from "~/lib/permissions.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { Can } from "~/components/providers/permission.provider";
 import { subject } from "@casl/ability";
+import { getUserInformation } from "~/lib/identity.server";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const user = await auth.api.getSession({ headers: request.headers });
+  const identity = await getUserInformation(request);
 
-  ensureCan(user?.user, "read", "Product");
+  ensureCanWithIdentity(identity, "read", "Product");
 
   const product = await prisma.product.findUnique({
     where: { id: params.productId },

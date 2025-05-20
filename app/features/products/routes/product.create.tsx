@@ -5,19 +5,15 @@ import { z } from "zod";
 import { productSchema } from "../components/product-form";
 import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
-import { auth } from "~/lib/auth";
-import { ensureCan } from "~/lib/permissions.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const name = formData.get("name") as string;
-  const session = await auth.api.getSession({ headers: request.headers });
+  const identity = await getUserInformation(request);
 
-  if (!session) {
-    return redirect("/app/products");
-  }
-
-  ensureCan(session.user, "create", "Product");
+  ensureCanWithIdentity(identity, "create", "Product");
 
   try {
     const validatedData = productSchema.parse({ name });
@@ -27,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
         name: validatedData.name,
         user: {
           connect: {
-            id: session.user.id,
+            id: identity.user.id,
           },
         },
       },
@@ -43,8 +39,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await auth.api.getSession({ headers: request.headers });
-  ensureCan(user?.user, "create", "Product");
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "create", "Product");
 
   return;
 }

@@ -16,6 +16,8 @@ import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
 import type { Route } from "./+types/members";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 
 export async function action({
   request,
@@ -24,10 +26,8 @@ export async function action({
   request: Request;
   params: { memberId: string; organizationId: string };
 }) {
-  const user = await auth.api.getSession({ headers: request.headers });
-  if (!user) {
-    return redirect("/login");
-  }
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "remove", "Organization:Members");
 
   await auth.api.removeMember({
     headers: request.headers,
@@ -40,7 +40,10 @@ export async function action({
   return { success: true, message: "Member removed successfully" };
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "remove", "Organization:Members");
+
   const memberId = params.memberId;
   const member = await prisma.member.findUnique({
     where: { id: memberId },

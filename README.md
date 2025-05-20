@@ -227,3 +227,8 @@ import { Can } from "~/components/providers/permission.provider";
   - [ ] Sanitization/Serialization
 - Usability
   - [ ] Breadcrumbs
+- Dev experience
+  - [ ] Dev tools
+    - https://react-router-devtools.forge42.dev/
+  - [ ] Env variables evaluation
+    - https://dane.computer/blogs/type-safe-environment-variables-in-remix

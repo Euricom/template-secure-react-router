@@ -3,14 +3,14 @@ import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
 import type { Route } from "./+types/onboarding.join.byId";
+import { getUserInformation } from "~/lib/identity.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  const inviteId = params.inviteId;
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "accept", "Organization:Members:Invite");
 
-  if (!session) {
-    return redirect("/login");
-  }
+  const inviteId = params.inviteId;
 
   if (!inviteId) {
     return redirect("/app");
@@ -49,6 +49,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "accept", "Organization:Members:Invite");
+
   const inviteId = params.inviteId;
 
   if (!inviteId) {

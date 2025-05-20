@@ -1,4 +1,4 @@
-import { useLoaderData, Form, Outlet, Link } from "react-router";
+import { useLoaderData, Outlet, Link } from "react-router";
 import { DataTable } from "~/components/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDate } from "~/lib/date";
@@ -6,24 +6,24 @@ import { Badge } from "~/components/ui/badge";
 import { Header } from "~/components/header";
 import prisma from "~/lib/prismaClient";
 import { Button } from "~/components/ui/button";
-import { auth } from "~/lib/auth";
 import type { LoaderFunctionArgs } from "react-router";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) throw new Response("Unauthorized", { status: 401 });
-  const orgId = session.session.activeOrganizationId;
-  if (!orgId) throw new Response("No active organization", { status: 400 });
+  const identity = await getUserInformation(request);
+
+  ensureCanWithIdentity(identity, "read", "Organization:Members");
 
   // Members (joined users)
   const members = await prisma.member.findMany({
-    where: { organizationId: orgId },
+    where: { organizationId: identity.organization.id },
     include: { user: true },
     orderBy: { createdAt: "desc" },
   });
   // Invitations (pending)
   const invitations = await prisma.invitation.findMany({
-    where: { organizationId: orgId, status: "pending" },
+    where: { organizationId: identity.organization.id, status: "pending" },
     orderBy: [{ expiresAt: "desc" }],
   });
   return {
@@ -113,13 +113,6 @@ export default function MembersPage() {
         } else {
           return (
             <div className="flex gap-2">
-              <Form method="post">
-                <input type="hidden" name="intent" value="cancel-invite" />
-                <input type="hidden" name="inviteId" value={row.original.id} />
-                <Button variant="destructive" size="sm" type="submit">
-                  Cancel
-                </Button>
-              </Form>
               <Link to={`/app/organization/members/invite/${row.original.id}/cancel`}>
                 <Button variant="outline" size="sm">
                   Cancel

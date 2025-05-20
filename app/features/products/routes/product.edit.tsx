@@ -5,12 +5,14 @@ import { z } from "zod";
 import { productSchema } from "../components/product-form";
 import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
-import { auth } from "~/lib/auth";
-import { ensureCan } from "~/lib/permissions.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { getUserInformation } from "~/lib/identity.server";
 import { subject } from "@casl/ability";
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const user = await auth.api.getSession({ headers: request.headers });
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "update", "Product");
+
   const product = await prisma.product.findUnique({
     where: { id: params.productId },
   });
@@ -19,7 +21,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     throw new Response("Product not found", { status: 404 });
   }
 
-  ensureCan(user?.user, "update", subject("Product", product));
+  ensureCanWithIdentity(identity, "update", subject("Product", product));
 
   const formData = await request.formData();
   const name = formData.get("name") as string;
@@ -44,7 +46,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const user = await auth.api.getSession({ headers: request.headers });
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "update", "Product");
 
   const product = await prisma.product.findUnique({
     where: { id: params.productId },
@@ -54,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw new Response("Product not found", { status: 404 });
   }
 
-  ensureCan(user?.user, "update", subject("Product", product));
+  ensureCanWithIdentity(identity, "update", subject("Product", product));
 
   return { product };
 }

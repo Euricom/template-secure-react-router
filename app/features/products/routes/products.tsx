@@ -2,14 +2,14 @@ import { useLoaderData, Link, type LoaderFunctionArgs } from "react-router";
 import prisma from "~/lib/prismaClient";
 import { Header } from "~/components/header";
 import { formatDate } from "~/lib/date";
-import { auth } from "~/lib/auth";
-import { ensureCan } from "~/lib/permissions.server";
+import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { Button } from "~/components/ui/button";
 import { Can } from "~/components/providers/permission.provider";
+import { getUserInformation } from "~/lib/identity.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await auth.api.getSession({ headers: request.headers });
-  ensureCan(user?.user, "read", "Product");
+  const identity = await getUserInformation(request);
+  ensureCanWithIdentity(identity, "read", "Product");
 
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
