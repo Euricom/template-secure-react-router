@@ -1,5 +1,5 @@
 import { expect, describe, test } from "vitest";
-import { ensureCan, ensureCanWithIdentity } from "./permissions.server";
+import { ensureCanWithIdentity } from "./permissions.server";
 import { subject } from "@casl/ability";
 
 const READ = "read";

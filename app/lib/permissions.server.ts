@@ -53,16 +53,6 @@ export const ability = (user?: UserType) => {
   return build();
 };
 
-/**
- * @deprecated Use ensureCanWithIdentity instead
- */
-export const ensureCan = (user: UserType, action: string, subject: string | Subject) => {
-  const abilityy = ability(user);
-  if (!abilityy.can(action, subject)) {
-    throw new Error("User does not have permission to perform this action");
-  }
-};
-
 export const ensureCanWithIdentity = (
   identity: Awaited<ReturnType<typeof getUserInformation>> | null,
   action: string,
