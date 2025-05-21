@@ -73,7 +73,7 @@ export default function MembersRemove() {
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
-      navigate("/app/products");
+      navigate("/app/organization/members");
     }
   }, [actionData, navigate]);
 

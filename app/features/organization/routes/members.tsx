@@ -89,7 +89,10 @@ export default function MembersPage() {
     {
       accessorKey: "joinedAt",
       header: "Joined/Invited",
-      cell: ({ row }) => formatDate(row.original.joinedAt ?? row.original.invitedAt ?? new Date()),
+      cell: ({ row }) => {
+        const date = row.original.joinedAt ?? row.original.invitedAt;
+        return date ? formatDate(date) : "N/A";
+      },
     },
     {
       id: "actions",
