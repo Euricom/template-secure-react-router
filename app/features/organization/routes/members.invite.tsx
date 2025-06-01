@@ -1,56 +1,54 @@
 import { Form, redirect } from "react-router";
-
 import { DialogClose, DialogDescription, DialogFooter, DialogHeader } from "~/components/ui/dialog";
-
 import { DialogContent } from "~/components/ui/dialog";
-
 import { useEffect } from "react";
 import { DialogTitle } from "~/components/ui/dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
 import { useActionData } from "react-router";
 import { toast } from "sonner";
 import { Dialog } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth";
 import { InputWithLabel } from "~/components/input-with-label";
-import { getUserInformation } from "~/lib/identity.server";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { createProtectedAction } from "~/lib/secureRoute";
 
-export async function action({ request }: { request: Request }) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "create", "Organization:Members:Invite");
+export const action = createProtectedAction({
+  permissions: {
+    action: "create",
+    subject: "Organization:Members:Invite",
+  },
+  function: async ({ request }) => {
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const role = formData.get("role") as string;
 
-  const formData = await request.formData();
-  const email = formData.get("email") as string;
-  const role = formData.get("role") as string;
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session) {
+      return redirect("/login");
+    }
 
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) {
-    return redirect("/login");
-  }
+    const organizationId = session.session.activeOrganizationId;
+    if (!organizationId) {
+      return redirect("/app/organization");
+    }
 
-  const organizationId = session.session.activeOrganizationId;
-  if (!organizationId) {
-    return redirect("/app/organization");
-  }
+    if (role !== "admin" && role !== "member" && role !== "owner") {
+      return { success: false, error: "Invalid role" };
+    }
 
-  if (role !== "admin" && role !== "member" && role !== "owner") {
-    return { success: false, error: "Invalid role" };
-  }
+    await auth.api.createInvitation({
+      headers: request.headers,
+      body: {
+        email,
+        role,
+        organizationId,
+      },
+    });
 
-  await auth.api.createInvitation({
-    headers: request.headers,
-    body: {
-      email,
-      role,
-      organizationId,
-    },
-  });
-
-  return { success: true, message: "Member invited successfully" };
-}
+    return { success: true, message: "Member invited successfully" };
+  },
+});
 
 export default function MembersInvite() {
   const actionData = useActionData<typeof action>();

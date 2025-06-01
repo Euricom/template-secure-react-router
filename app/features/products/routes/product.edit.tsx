@@ -1,4 +1,4 @@
-import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import { useActionData, useLoaderData, useNavigation } from "react-router";
 import prisma from "~/lib/prismaClient";
 import { z } from "zod";
@@ -6,61 +6,67 @@ import { productSchema } from "../components/product-form";
 import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
 import { subject } from "@casl/ability";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "update", "Product");
-
-  const product = await prisma.product.findUnique({
-    where: { id: params.productId },
-  });
-
-  if (!product) {
-    throw new Response("Product not found", { status: 404 });
-  }
-
-  ensureCanWithIdentity(identity, "update", subject("Product", product));
-
-  const formData = await request.formData();
-  const name = formData.get("name") as string;
-
-  try {
-    const validatedData = productSchema.parse({ name });
-
-    await prisma.product.update({
+export const action = createProtectedAction({
+  permissions: {
+    action: "update",
+    subject: "Product",
+  },
+  function: async ({ request, params, identity }) => {
+    const product = await prisma.product.findUnique({
       where: { id: params.productId },
-      data: {
-        name: validatedData.name,
-      },
     });
 
-    return redirect(`/app/products/${params.productId}`);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { errors: error.flatten().fieldErrors };
+    if (!product) {
+      throw new Response("Product not found", { status: 404 });
     }
-    return { error: "Failed to update product" };
-  }
-}
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "update", "Product");
+    ensureCanWithIdentity(identity, "update", subject("Product", product));
 
-  const product = await prisma.product.findUnique({
-    where: { id: params.productId },
-  });
+    const formData = await request.formData();
+    const name = formData.get("name") as string;
 
-  if (!product) {
-    throw new Response("Product not found", { status: 404 });
-  }
+    try {
+      const validatedData = productSchema.parse({ name });
 
-  ensureCanWithIdentity(identity, "update", subject("Product", product));
+      await prisma.product.update({
+        where: { id: params.productId },
+        data: {
+          name: validatedData.name,
+        },
+      });
 
-  return { product };
-}
+      return redirect(`/app/products/${params.productId}`);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return { errors: error.flatten().fieldErrors };
+      }
+      return { error: "Failed to update product" };
+    }
+  },
+});
+
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "update",
+    subject: "Product",
+  },
+  function: async ({ params, identity }) => {
+    const product = await prisma.product.findUnique({
+      where: { id: params.productId },
+    });
+
+    if (!product) {
+      throw new Response("Product not found", { status: 404 });
+    }
+
+    ensureCanWithIdentity(identity, "update", subject("Product", product));
+
+    return { product };
+  },
+});
 
 export default function EditProductPage() {
   const { product } = useLoaderData<typeof loader>();

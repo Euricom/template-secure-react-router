@@ -3,26 +3,26 @@ import prisma from "~/lib/prismaClient";
 import { Header } from "~/components/header";
 import { formatDate } from "~/lib/date";
 import { Button } from "~/components/ui/button";
-import type { Route } from "./+types/product.detail";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { Can } from "~/components/providers/permission.provider";
 import { subject } from "@casl/ability";
-import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const identity = await getUserInformation(request);
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "read",
+    subject: "Product",
+  },
+  function: async ({ params }) => {
+    const product = await prisma.product.findUnique({
+      where: { id: params.productId },
+    });
 
-  ensureCanWithIdentity(identity, "read", "Product");
-
-  const product = await prisma.product.findUnique({
-    where: { id: params.productId },
-  });
-
-  if (!product) {
-    throw new Response("Product not found", { status: 404 });
-  }
-  return { product };
-}
+    if (!product) {
+      throw new Response("Product not found", { status: 404 });
+    }
+    return { product };
+  },
+});
 
 export default function ProductDetailPage() {
   const { product } = useLoaderData<typeof loader>();

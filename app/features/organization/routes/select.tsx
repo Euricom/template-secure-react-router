@@ -10,14 +10,6 @@ import { auth } from "~/lib/auth";
 import { Plus } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogTitle } from "~/components/ui/alert-dialog";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const organizations = await auth.api.listOrganizations({
-    headers: request.headers,
-  });
-
-  return { organizations };
-}
-
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const organizationId = formData.get("organizationId") as string;
@@ -33,6 +25,14 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   return redirect("/app");
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const organizations = await auth.api.listOrganizations({
+    headers: request.headers,
+  });
+
+  return { organizations };
 }
 
 export default function Select() {

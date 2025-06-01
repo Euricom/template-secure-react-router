@@ -6,50 +6,50 @@ import { Badge } from "~/components/ui/badge";
 import { Header } from "~/components/header";
 import prisma from "~/lib/prismaClient";
 import { Button } from "~/components/ui/button";
-import type { LoaderFunctionArgs } from "react-router";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const identity = await getUserInformation(request);
-
-  ensureCanWithIdentity(identity, "read", "Organization:Members");
-
-  // Members (joined users)
-  const members = await prisma.member.findMany({
-    where: { organizationId: identity.organization.id },
-    include: { user: true },
-    orderBy: { createdAt: "desc" },
-  });
-  // Invitations (pending)
-  const invitations = await prisma.invitation.findMany({
-    where: { organizationId: identity.organization.id, status: "pending" },
-    orderBy: [{ expiresAt: "desc" }],
-  });
-  return {
-    members: members.map((m) => ({
-      id: m.id,
-      name: m.user.name,
-      email: m.user.email,
-      role: m.role,
-      status: "active",
-      joinedAt: m.createdAt,
-      invitedAt: null,
-      userId: m.userId,
-      type: "member" as const,
-    })),
-    invitations: invitations.map((i) => ({
-      id: i.id,
-      name: null,
-      email: i.email,
-      role: i.role ?? "user",
-      status: "invited",
-      joinedAt: null,
-      invitedAt: i.expiresAt,
-      type: "invite" as const,
-    })),
-  };
-}
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "read",
+    subject: "Organization:Members",
+  },
+  function: async ({ identity }) => {
+    // Members (joined users)
+    const members = await prisma.member.findMany({
+      where: { organizationId: identity.organization.id },
+      include: { user: true },
+      orderBy: { createdAt: "desc" },
+    });
+    // Invitations (pending)
+    const invitations = await prisma.invitation.findMany({
+      where: { organizationId: identity.organization.id, status: "pending" },
+      orderBy: [{ expiresAt: "desc" }],
+    });
+    return {
+      members: members.map((m) => ({
+        id: m.id,
+        name: m.user.name,
+        email: m.user.email,
+        role: m.role,
+        status: "active",
+        joinedAt: m.createdAt,
+        invitedAt: null,
+        userId: m.userId,
+        type: "member" as const,
+      })),
+      invitations: invitations.map((i) => ({
+        id: i.id,
+        name: null,
+        email: i.email,
+        role: i.role ?? "user",
+        status: "invited",
+        joinedAt: null,
+        invitedAt: i.expiresAt,
+        type: "invite" as const,
+      })),
+    };
+  },
+});
 
 export default function MembersPage() {
   const { members, invitations } = useLoaderData<typeof loader>();

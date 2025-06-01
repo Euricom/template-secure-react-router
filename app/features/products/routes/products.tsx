@@ -1,22 +1,24 @@
-import { useLoaderData, Link, type LoaderFunctionArgs } from "react-router";
+import { useLoaderData, Link } from "react-router";
 import prisma from "~/lib/prismaClient";
 import { Header } from "~/components/header";
 import { formatDate } from "~/lib/date";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { Button } from "~/components/ui/button";
 import { Can } from "~/components/providers/permission.provider";
-import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "read", "Product");
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "read",
+    subject: "Product",
+  },
+  function: async () => {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-
-  return { products };
-}
+    return { products };
+  },
+});
 
 export default function ProductsPage() {
   const { products } = useLoaderData<typeof loader>();

@@ -1,22 +1,67 @@
-import { Form, redirect, useLoaderData, type ActionFunctionArgs } from "react-router";
+import { Form, redirect, useLoaderData } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
-import type { Route } from "./+types/onboarding.join.byId";
-import { getUserInformation } from "~/lib/identity.server";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "accept", "Organization:Members:Invite");
+export const action = createProtectedAction({
+  permissions: {
+    action: "accept",
+    subject: "Organization:Members:Invite",
+  },
+  function: async ({ request, params }) => {
+    const inviteId = params.inviteId;
 
-  const inviteId = params.inviteId;
+    if (!inviteId) {
+      return redirect("/app");
+    }
 
-  if (!inviteId) {
-    return redirect("/app");
-  }
+    try {
+      const invite = await auth.api.getInvitation({
+        headers: request.headers,
+        query: {
+          id: inviteId,
+        },
+      });
 
-  try {
+      if (!invite) {
+        return redirect("/app");
+      }
+
+      await auth.api.acceptInvitation({
+        headers: request.headers,
+        body: {
+          invitationId: invite.id,
+        },
+      });
+
+      await auth.api.setActiveOrganization({
+        headers: request.headers,
+        body: {
+          organizationId: invite.organizationId,
+        },
+      });
+
+      return redirect("/app");
+    } catch (error) {
+      return { error: "Failed to join organization" };
+    }
+  },
+});
+
+// TODO: Validate params first
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "accept",
+    subject: "Organization:Members:Invite",
+  },
+  function: async ({ params, request }) => {
+    const inviteId = params.inviteId;
+
+    if (!inviteId) {
+      return redirect("/app");
+    }
+
     const invite = await auth.api.getInvitation({
       headers: request.headers,
       query: {
@@ -24,51 +69,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
       },
     });
 
-    if (!invite) {
-      return redirect("/app");
-    }
-
-    await auth.api.acceptInvitation({
-      headers: request.headers,
-      body: {
-        invitationId: invite.id,
-      },
-    });
-
-    await auth.api.setActiveOrganization({
-      headers: request.headers,
-      body: {
-        organizationId: invite.organizationId,
-      },
-    });
-
-    return redirect("/app");
-  } catch (error) {
-    return { error: "Failed to join organization" };
-  }
-}
-
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "accept", "Organization:Members:Invite");
-
-  const inviteId = params.inviteId;
-
-  if (!inviteId) {
-    return redirect("/app");
-  }
-
-  const invite = await auth.api.getInvitation({
-    headers: request.headers,
-    query: {
-      id: inviteId,
-    },
-  });
-
-  return {
-    invite,
-  };
-}
+    return {
+      invite,
+    };
+  },
+});
 
 export default function OnboardingJoin() {
   const { invite } = useLoaderData<typeof loader>();

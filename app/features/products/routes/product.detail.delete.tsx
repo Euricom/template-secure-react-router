@@ -7,39 +7,36 @@ import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import type { OutletContext } from "./product.detail";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
 import { subject } from "@casl/ability";
+import { createProtectedAction } from "~/lib/secureRoute";
 
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: { productId: string };
-}) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "delete", "Product");
-
-  const product = await prisma.product.findUnique({
-    where: { id: params.productId },
-  });
-
-  if (!product) {
-    throw new Response("Product not found", { status: 404 });
-  }
-
-  ensureCanWithIdentity(identity, "delete", subject("Product", product));
-
-  try {
-    await prisma.product.delete({
+export const action = createProtectedAction({
+  permissions: {
+    action: "delete",
+    subject: "Product",
+  },
+  function: async ({ params, identity }) => {
+    const product = await prisma.product.findUnique({
       where: { id: params.productId },
     });
 
-    return { success: true, message: "Product deleted successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to delete product" };
-  }
-}
+    if (!product) {
+      throw new Response("Product not found", { status: 404 });
+    }
+
+    ensureCanWithIdentity(identity, "delete", subject("Product", product));
+
+    try {
+      await prisma.product.delete({
+        where: { id: params.productId },
+      });
+
+      return { success: true, message: "Product deleted successfully" };
+    } catch (error) {
+      return { success: false, error: "Failed to delete product" };
+    }
+  },
+});
 
 export default function ProductDelete() {
   const { product } = useOutletContext<OutletContext>();

@@ -4,7 +4,6 @@ import {
   useNavigation,
   Form,
   redirect,
-  type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "react-router";
 import { z } from "zod";
@@ -30,11 +29,13 @@ import { useState } from "react";
 import { auth } from "~/lib/auth";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
 const orgNameSchema = z.object({
   name: z.string().min(1, "Name is required"),
 });
 
+// TODO: Move to secureRoute, split up into multiple actions
 export async function action({ request }: ActionFunctionArgs) {
   const identity = await getUserInformation(request);
 
@@ -88,18 +89,21 @@ export async function action({ request }: ActionFunctionArgs) {
   return null;
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "read", "Organization");
-
-  const activeOrg = await auth.api.getFullOrganization({
-    headers: request.headers,
-    params: {
-      organizationId: identity.organization.id,
-    },
-  });
-  return { activeOrg };
-}
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "read",
+    subject: "Organization",
+  },
+  function: async ({ request, identity }) => {
+    const activeOrg = await auth.api.getFullOrganization({
+      headers: request.headers,
+      params: {
+        organizationId: identity.organization.id,
+      },
+    });
+    return { activeOrg };
+  },
+});
 
 export default function OrganizationGeneral() {
   const { activeOrg } = useLoaderData<{ activeOrg: { id: string; name: string; slug: string } }>();

@@ -1,76 +1,70 @@
 import { Form, redirect, useLoaderData } from "react-router";
-
 import { DialogFooter } from "~/components/ui/dialog";
-
 import { DialogContent } from "~/components/ui/dialog";
-
 import { useEffect } from "react";
 import { DialogTitle } from "~/components/ui/dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
 import { useActionData } from "react-router";
 import { toast } from "sonner";
 import { Dialog } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
-import type { Route } from "./+types/members";
-import { getUserInformation } from "~/lib/identity.server";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: { inviteId: string };
-}) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "cancel", "Organization:Members:Invite");
+export const action = createProtectedAction({
+  permissions: {
+    action: "cancel",
+    subject: "Organization:Members:Invite",
+  },
+  function: async ({ request, params }) => {
+    const inviteId = params.inviteId;
 
-  const inviteId = params.inviteId;
+    if (!inviteId) {
+      return { success: false, message: "Invitation ID is required" };
+    }
 
-  if (!inviteId) {
-    return { success: false, message: "Invitation ID is required" };
-  }
+    await auth.api.cancelInvitation({
+      headers: request.headers,
+      body: {
+        invitationId: inviteId,
+      },
+    });
 
-  await auth.api.cancelInvitation({
-    headers: request.headers,
-    body: {
-      invitationId: inviteId,
-    },
-  });
+    return { success: true, message: "Invitation cancelled successfully" };
+  },
+});
 
-  return { success: true, message: "Invitation cancelled successfully" };
-}
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "cancel",
+    subject: "Organization:Members:Invite",
+  },
+  function: async ({ params }) => {
+    const inviteId = params.inviteId;
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "cancel", "Organization:Members:Invite");
+    if (!inviteId) {
+      return redirect("/app/organization/members");
+    }
 
-  const inviteId = params.inviteId;
+    const invitee = await prisma.invitation.findUnique({
+      where: {
+        id: inviteId,
+      },
+    });
 
-  if (!inviteId) {
-    return redirect("/app/organization/members");
-  }
+    if (!invitee) {
+      return redirect("/app/organization/members");
+    }
 
-  const invitee = await prisma.invitation.findUnique({
-    where: {
-      id: inviteId,
-    },
-  });
-
-  if (!invitee) {
-    return redirect("/app/organization/members");
-  }
-
-  return {
-    invite: {
-      email: invitee.email,
-    },
-  };
-}
+    return {
+      invite: {
+        email: invitee.email,
+      },
+    };
+  },
+});
 
 export default function MembersInviteCancel() {
   const { invite } = useLoaderData<typeof loader>();

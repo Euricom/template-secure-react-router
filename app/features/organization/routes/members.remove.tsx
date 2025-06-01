@@ -1,14 +1,10 @@
-import { Form, redirect, useLoaderData } from "react-router";
-
+import { Form, useLoaderData } from "react-router";
 import { DialogFooter } from "~/components/ui/dialog";
-
 import { DialogContent } from "~/components/ui/dialog";
-
 import { useEffect } from "react";
 import { DialogTitle } from "~/components/ui/dialog";
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router";
-
+import { useNavigate } from "react-router";
 import { useActionData } from "react-router";
 import { toast } from "sonner";
 import { Dialog } from "~/components/ui/dialog";
@@ -19,6 +15,7 @@ import type { Route } from "./+types/members";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { getUserInformation } from "~/lib/identity.server";
 
+// TODO: Move to secureRoute, validate params first
 export async function action({
   request,
   params,

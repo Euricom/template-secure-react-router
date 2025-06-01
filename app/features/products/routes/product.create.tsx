@@ -7,36 +7,40 @@ import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedAction } from "~/lib/secureRoute";
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const identity = await getUserInformation(request);
+export const action = createProtectedAction({
+  permissions: {
+    action: "create",
+    subject: "Product",
+  },
+  function: async ({ request, identity }) => {
+    const formData = await request.formData();
+    const name = formData.get("name") as string;
 
-  ensureCanWithIdentity(identity, "create", "Product");
+    try {
+      const validatedData = productSchema.parse({ name });
 
-  try {
-    const validatedData = productSchema.parse({ name });
-
-    await prisma.product.create({
-      data: {
-        name: validatedData.name,
-        user: {
-          connect: {
-            id: identity.user.id,
+      await prisma.product.create({
+        data: {
+          name: validatedData.name,
+          user: {
+            connect: {
+              id: identity.user.id,
+            },
           },
         },
-      },
-    });
+      });
 
-    return redirect("/app/products");
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { errors: error.flatten().fieldErrors };
+      return redirect("/app/products");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return { errors: error.flatten().fieldErrors };
+      }
+      return { error: "Failed to create product" };
     }
-    return { error: "Failed to create product" };
-  }
-}
+  },
+});
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const identity = await getUserInformation(request);

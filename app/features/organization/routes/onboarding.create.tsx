@@ -1,4 +1,4 @@
-import { redirect, type ActionFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import { useActionData, useNavigation } from "react-router";
 import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
@@ -12,56 +12,58 @@ import {
   CardFooter,
 } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
-import { getUserInformation } from "~/lib/identity.server";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
+import { createProtectedAction } from "~/lib/secureRoute";
 
 const onboardingSchema = z.object({
   name: z.string().min(1, "Name is required"),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "create", "Organization");
+export const action = createProtectedAction({
+  permissions: {
+    action: "create",
+    subject: "Organization",
+  },
+  function: async ({ request, identity }) => {
+    const formData = await request.formData();
+    const name = formData.get("name") as string;
+    try {
+      const validatedData = onboardingSchema.parse({ name });
 
-  const formData = await request.formData();
-  const name = formData.get("name") as string;
-  try {
-    const validatedData = onboardingSchema.parse({ name });
+      const slug = validatedData.name.toLowerCase().replace(/ /g, "-");
 
-    const slug = validatedData.name.toLowerCase().replace(/ /g, "-");
+      const isSlugAvailable = await auth.api.checkOrganizationSlug({
+        headers: request.headers,
+        body: {
+          slug,
+        },
+      });
 
-    const isSlugAvailable = await auth.api.checkOrganizationSlug({
-      headers: request.headers,
-      body: {
-        slug,
-      },
-    });
+      if (!isSlugAvailable) {
+        return { error: "Organization slug is already taken" };
+      }
 
-    if (!isSlugAvailable) {
-      return { error: "Organization slug is already taken" };
-    }
+      const organization = await auth.api.createOrganization({
+        headers: request.headers,
+        body: {
+          name: validatedData.name,
+          slug,
+          userId: identity.user.id,
+        },
+      });
 
-    const organization = await auth.api.createOrganization({
-      headers: request.headers,
-      body: {
-        name: validatedData.name,
-        slug,
-        userId: identity.user.id,
-      },
-    });
+      if (!organization) {
+        return { error: "Failed to create organization" };
+      }
 
-    if (!organization) {
+      return redirect("/app");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return { errors: error.flatten().fieldErrors };
+      }
       return { error: "Failed to create organization" };
     }
-
-    return redirect("/app");
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { errors: error.flatten().fieldErrors };
-    }
-    return { error: "Failed to create organization" };
-  }
-}
+  },
+});
 
 export default function OnboardingCreate() {
   const actionData = useActionData<typeof action>();
