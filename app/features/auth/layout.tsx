@@ -1,7 +1,7 @@
-import { Outlet, redirect } from "react-router";
+import { Outlet, redirect, type LoaderFunctionArgs } from "react-router";
 import { auth } from "~/lib/auth";
 
-export async function loader({ request }: { request: Request }) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const session = await auth.api.getSession({
     headers: request.headers,
   });

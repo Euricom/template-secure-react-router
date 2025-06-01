@@ -1,4 +1,4 @@
-import { Outlet, redirect, useOutletContext } from "react-router";
+import { Outlet, redirect, useOutletContext, type LoaderFunctionArgs } from "react-router";
 import { AppSidebar } from "./components/app-sidebar";
 import {
   Breadcrumb,
@@ -73,7 +73,7 @@ const navAdmin: NavItem[] = [
   },
 ];
 
-export const loader = async ({ request }: { request: Request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await auth.api.getSession({
     headers: request.headers,
   });
