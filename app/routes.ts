@@ -3,6 +3,8 @@ import { adminRoutes } from "./features/admin/routes";
 import { productsRoutes } from "./features/products/routes";
 import { authRoutes } from "./features/auth/routes";
 import { organizationRoutes } from "./features/organization/routes";
+import { dashboardRoutes } from "./features/dashboard/routes";
+
 export default [
   index("./features/marketing/routes/landing.tsx"),
   route("/goodbye", "./features/marketing/routes/goodbye.tsx"),
@@ -15,9 +17,7 @@ export default [
     layout("./features/dashboard/layout.tsx", [
       ...prefix("/app", [
         // General routes
-        index("./features/dashboard/routes/home.tsx"),
-        route("/profile", "./features/dashboard/routes/profile.tsx"),
-
+        ...dashboardRoutes,
         ...organizationRoutes,
         ...productsRoutes,
         ...adminRoutes,

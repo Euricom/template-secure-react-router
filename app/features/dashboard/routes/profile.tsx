@@ -7,11 +7,10 @@ import { DataTable } from "~/components/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDate } from "~/lib/date";
 import { Badge } from "~/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { auth } from "~/lib/auth";
-import { redirect, useLoaderData, Form, useActionData } from "react-router";
+import { useLoaderData, Form } from "react-router";
 import { authClient } from "~/lib/auth-client";
-import prisma from "~/lib/prismaClient";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,8 +22,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
-import z from "zod";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
 type Session = {
   id: string;
@@ -32,91 +30,6 @@ type Session = {
   createdAt: Date;
   isCurrent: boolean;
 };
-
-// TODO: split intent into separate actions
-export const action = createProtectedAction({
-  function: async ({ request }) => {
-    const formData = await request.formData();
-    const sessionId = formData.get("sessionId") as string;
-    const intent = formData.get("intent") as string;
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-
-    if (intent === "revoke-session" && sessionId) {
-      try {
-        // Fetch the session to get the token through prisma
-        const sessionFromDb = await prisma.session.findUnique({
-          where: {
-            id: sessionId,
-          },
-        });
-
-        if (!sessionFromDb) {
-          return { success: false, error: "Session not found" };
-        }
-
-        await auth.api.revokeSession({
-          headers: request.headers,
-          body: {
-            token: sessionFromDb.token,
-          },
-        });
-        return { success: true, message: "Session revoked successfully" };
-      } catch (error) {
-        return { success: false, error: "Failed to revoke session" };
-      }
-    }
-
-    if (intent === "update-profile" && name && email) {
-      try {
-        const activeSession = await auth.api.getSession({
-          headers: request.headers,
-        });
-
-        if (!activeSession) {
-          return redirect("/login");
-        }
-
-        await auth.api.updateUser({
-          headers: request.headers,
-          body: {
-            name,
-          },
-        });
-
-        if (email !== activeSession.user.email) {
-          await auth.api.changeEmail({
-            headers: request.headers,
-            body: {
-              newEmail: email,
-              callbackURL: "http://localhost:5173/app/profile",
-            },
-          });
-        }
-
-        return { success: true, message: "Profile updated successfully" };
-      } catch (error) {
-        return { success: false, error: "Failed to update profile" };
-      }
-    }
-
-    if (intent === "delete-account") {
-      try {
-        await auth.api.deleteUser({
-          headers: request.headers,
-          body: {
-            callbackURL: "http://localhost:5173/goodbye", // Some auth providers require password confirmation
-          },
-        });
-        return { success: true, message: "Account deletion request sent to your email" };
-      } catch (error) {
-        return { success: false, error: "Failed to delete account" };
-      }
-    }
-
-    return { success: false, error: "Invalid action" };
-  },
-});
 
 export const loader = createProtectedLoader({
   function: async ({ request, identity }) => {
@@ -147,18 +60,20 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionToRevoke, setSessionToRevoke] = useState<Session | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const actionData = useActionData<typeof action>();
+  // const actionData = useActionData<typeof action>();
+
+  /* TODO: show a success toast */
 
   // Show toast notifications when action data changes
-  useEffect(() => {
-    if (actionData) {
-      if (actionData.success) {
-        toast.success(actionData.message);
-      } else if (actionData.error) {
-        toast.error(actionData.error);
-      }
-    }
-  }, [actionData]);
+  // useEffect(() => {
+  //   if (actionData) {
+  //     if (actionData.success) {
+  //       toast.success(actionData.message);
+  //     } else if (actionData.error) {
+  //       toast.error(actionData.error);
+  //     }
+  //   }
+  // }, [actionData]);
 
   const columns: ColumnDef<Session>[] = [
     {
@@ -217,7 +132,8 @@ export default function ProfilePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Form method="post">
+            <Form method="post" action="/app/profile/revoke-session">
+              {/* TODO: show a success toast */}
               <input type="hidden" name="sessionId" value={sessionToRevoke?.id} />
               <input type="hidden" name="intent" value="revoke-session" />
               <div className="flex gap-2">
@@ -250,7 +166,9 @@ export default function ProfilePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Form method="post">
+            <Form method="post" action="/app/profile/delete">
+              {/* TODO: show a success toast */}
+
               <input type="hidden" name="intent" value="delete-account" />
               <div className="flex gap-2">
                 <AlertDialogCancel asChild>
@@ -283,7 +201,9 @@ export default function ProfilePage() {
 
             <Separator className="my-4" />
 
-            <Form method="post">
+            <Form method="post" action="/app/profile/update">
+              {/* TODO: show a success toast */}
+
               <input type="hidden" name="intent" value="update-profile" />
               <div className="grid gap-4">
                 <div className="grid gap-2">
