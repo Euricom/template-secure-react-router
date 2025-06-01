@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 type Session = {
   id: string;
@@ -38,116 +39,112 @@ type Session = {
   isCurrent: boolean;
 };
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const sessionId = formData.get("sessionId") as string;
-  const intent = formData.get("intent") as string;
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
+export const action = createProtectedAction({
+  function: async ({ request }) => {
+    const formData = await request.formData();
+    const sessionId = formData.get("sessionId") as string;
+    const intent = formData.get("intent") as string;
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
 
-  if (intent === "revoke-session" && sessionId) {
-    try {
-      // Fetch the session to get the token through prisma
-      const sessionFromDb = await prisma.session.findUnique({
-        where: {
-          id: sessionId,
-        },
-      });
-
-      if (!sessionFromDb) {
-        return { success: false, error: "Session not found" };
-      }
-
-      await auth.api.revokeSession({
-        headers: request.headers,
-        body: {
-          token: sessionFromDb.token,
-        },
-      });
-      return { success: true, message: "Session revoked successfully" };
-    } catch (error) {
-      return { success: false, error: "Failed to revoke session" };
-    }
-  }
-
-  if (intent === "update-profile" && name && email) {
-    try {
-      const activeSession = await auth.api.getSession({
-        headers: request.headers,
-      });
-
-      if (!activeSession) {
-        return redirect("/login");
-      }
-
-      await auth.api.updateUser({
-        headers: request.headers,
-        body: {
-          name,
-        },
-      });
-
-      if (email !== activeSession.user.email) {
-        await auth.api.changeEmail({
-          headers: request.headers,
-          body: {
-            newEmail: email,
-            callbackURL: "http://localhost:5173/app/profile",
+    if (intent === "revoke-session" && sessionId) {
+      try {
+        // Fetch the session to get the token through prisma
+        const sessionFromDb = await prisma.session.findUnique({
+          where: {
+            id: sessionId,
           },
         });
+
+        if (!sessionFromDb) {
+          return { success: false, error: "Session not found" };
+        }
+
+        await auth.api.revokeSession({
+          headers: request.headers,
+          body: {
+            token: sessionFromDb.token,
+          },
+        });
+        return { success: true, message: "Session revoked successfully" };
+      } catch (error) {
+        return { success: false, error: "Failed to revoke session" };
       }
-
-      return { success: true, message: "Profile updated successfully" };
-    } catch (error) {
-      return { success: false, error: "Failed to update profile" };
     }
-  }
 
-  if (intent === "delete-account") {
-    try {
-      await auth.api.deleteUser({
-        headers: request.headers,
-        body: {
-          callbackURL: "http://localhost:5173/goodbye", // Some auth providers require password confirmation
-        },
-      });
-      return { success: true, message: "Account deletion request sent to your email" };
-    } catch (error) {
-      return { success: false, error: "Failed to delete account" };
+    if (intent === "update-profile" && name && email) {
+      try {
+        const activeSession = await auth.api.getSession({
+          headers: request.headers,
+        });
+
+        if (!activeSession) {
+          return redirect("/login");
+        }
+
+        await auth.api.updateUser({
+          headers: request.headers,
+          body: {
+            name,
+          },
+        });
+
+        if (email !== activeSession.user.email) {
+          await auth.api.changeEmail({
+            headers: request.headers,
+            body: {
+              newEmail: email,
+              callbackURL: "http://localhost:5173/app/profile",
+            },
+          });
+        }
+
+        return { success: true, message: "Profile updated successfully" };
+      } catch (error) {
+        return { success: false, error: "Failed to update profile" };
+      }
     }
-  }
 
-  return { success: false, error: "Invalid action" };
-}
+    if (intent === "delete-account") {
+      try {
+        await auth.api.deleteUser({
+          headers: request.headers,
+          body: {
+            callbackURL: "http://localhost:5173/goodbye", // Some auth providers require password confirmation
+          },
+        });
+        return { success: true, message: "Account deletion request sent to your email" };
+      } catch (error) {
+        return { success: false, error: "Failed to delete account" };
+      }
+    }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const activeSession = await auth.api.getSession({
-    headers: request.headers,
-  });
+    return { success: false, error: "Invalid action" };
+  },
+});
 
-  if (!activeSession) {
-    return redirect("/login");
-  }
+export const loader = createProtectedLoader({
+  function: async ({ request, identity }) => {
+    const sessions = await auth.api.listSessions({
+      headers: request.headers,
+    });
 
-  const sessions = await auth.api.listSessions({
-    headers: request.headers,
-  });
-
-  return {
-    user: {
-      name: activeSession.user.name,
-      email: activeSession.user.email,
-    },
-    sessions: sessions.map(
-      (session): Session => ({
-        id: session.id,
-        userAgent: session.userAgent ?? "",
-        createdAt: session.createdAt,
-        isCurrent: session.id === activeSession.session.id,
-      })
-    ),
-  };
-}
+    return {
+      user: {
+        name: identity.user.name,
+        email: identity.user.email,
+      },
+      sessions: sessions.map(
+        (session): Session => ({
+          id: session.id,
+          userAgent: session.userAgent ?? "",
+          createdAt: session.createdAt,
+          isCurrent: session.id === identity.session.session.id,
+        })
+      ),
+    };
+  },
+});
 
 export default function ProfilePage() {
   const { user, sessions } = useLoaderData<typeof loader>();

@@ -6,19 +6,26 @@ import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog
 import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import type { OutletContext } from "./user.detail";
+import { createProtectedAction } from "~/lib/secureRoute";
+import { z } from "zod";
 
-export async function action({ params }: { params: { id: string } }) {
-  try {
-    // Delete all sessions for the user
-    await prisma.session.deleteMany({
-      where: { userId: params.id },
-    });
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ params }) => {
+    try {
+      // Delete all sessions for the user
+      await prisma.session.deleteMany({
+        where: { userId: params.id },
+      });
 
-    return { success: true, message: "All sessions revoked successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to revoke sessions" };
-  }
-}
+      return { success: true, message: "All sessions revoked successfully" };
+    } catch (error) {
+      return { success: false, error: "Failed to revoke sessions" };
+    }
+  },
+});
 
 export default function UserRevokeAllSessionsPage() {
   const { user } = useOutletContext<OutletContext>();

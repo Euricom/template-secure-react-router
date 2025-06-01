@@ -9,29 +9,36 @@ import prisma from "~/lib/prismaClient";
 import { formatDate } from "~/lib/date";
 import { Link } from "react-router";
 import { authClient } from "~/lib/auth-client";
+import { createProtectedLoader } from "~/lib/secureRoute";
+import { z } from "zod";
 
-export async function loader({ params }: { params: { id: string } }) {
-  const user = await prisma.user.findUnique({
-    where: { id: params.id },
-    include: {
-      sessions: {
-        orderBy: { createdAt: "desc" },
-        take: 30,
+export const loader = createProtectedLoader({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ params }) => {
+    const user = await prisma.user.findUnique({
+      where: { id: params.id },
+      include: {
+        sessions: {
+          orderBy: { createdAt: "desc" },
+          take: 30,
+        },
       },
-    },
-  });
+    });
 
-  if (!user) {
-    throw new Response("User not found", { status: 404 });
-  }
+    if (!user) {
+      throw new Response("User not found", { status: 404 });
+    }
 
-  return {
-    user: {
-      ...user,
-      role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
-    },
-  };
-}
+    return {
+      user: {
+        ...user,
+        role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
+      },
+    };
+  },
+});
 
 export default function UserDetailPage() {
   const { user } = useLoaderData<typeof loader>();

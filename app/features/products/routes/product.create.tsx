@@ -1,13 +1,11 @@
-import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import { useActionData, useNavigation } from "react-router";
 import prisma from "~/lib/prismaClient";
 import { z } from "zod";
 import { productSchema } from "../components/product-form";
 import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -42,12 +40,15 @@ export const action = createProtectedAction({
   },
 });
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "create", "Product");
-
-  return;
-}
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "create",
+    subject: "Product",
+  },
+  function: async () => {
+    return;
+  },
+});
 
 export default function CreateProductPage() {
   const actionData = useActionData<typeof action>();

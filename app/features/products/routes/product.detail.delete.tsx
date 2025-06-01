@@ -9,12 +9,16 @@ import type { OutletContext } from "./product.detail";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { subject } from "@casl/ability";
 import { createProtectedAction } from "~/lib/secureRoute";
+import z from "zod";
 
 export const action = createProtectedAction({
   permissions: {
     action: "delete",
     subject: "Product",
   },
+  paramValidation: z.object({
+    productId: z.string(),
+  }),
   function: async ({ params, identity }) => {
     const product = await prisma.product.findUnique({
       where: { id: params.productId },

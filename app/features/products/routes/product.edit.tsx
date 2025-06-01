@@ -14,6 +14,9 @@ export const action = createProtectedAction({
     action: "update",
     subject: "Product",
   },
+  paramValidation: z.object({
+    productId: z.string(),
+  }),
   function: async ({ request, params, identity }) => {
     const product = await prisma.product.findUnique({
       where: { id: params.productId },
@@ -53,6 +56,9 @@ export const loader = createProtectedLoader({
     action: "update",
     subject: "Product",
   },
+  paramValidation: z.object({
+    productId: z.string(),
+  }),
   function: async ({ params, identity }) => {
     const product = await prisma.product.findUnique({
       where: { id: params.productId },

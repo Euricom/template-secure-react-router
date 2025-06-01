@@ -6,13 +6,16 @@ import { Package } from "lucide-react";
 import prisma from "~/lib/prismaClient";
 import { Header } from "~/components/header";
 import { formatDate } from "~/lib/date";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
-export async function loader() {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  return { products };
-}
+export const loader = createProtectedLoader({
+  function: async () => {
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return { products };
+  },
+});
 
 export default function Home() {
   const { data: session } = authClient.useSession();

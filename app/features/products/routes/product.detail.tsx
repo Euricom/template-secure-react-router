@@ -6,12 +6,16 @@ import { Button } from "~/components/ui/button";
 import { Can } from "~/components/providers/permission.provider";
 import { subject } from "@casl/ability";
 import { createProtectedLoader } from "~/lib/secureRoute";
+import z from "zod";
 
 export const loader = createProtectedLoader({
   permissions: {
     action: "read",
     subject: "Product",
   },
+  paramValidation: z.object({
+    productId: z.string(),
+  }),
   function: async ({ params }) => {
     const product = await prisma.product.findUnique({
       where: { id: params.productId },

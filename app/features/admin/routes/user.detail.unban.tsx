@@ -6,23 +6,30 @@ import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog
 import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import type { OutletContext } from "./user.detail";
+import { createProtectedAction } from "~/lib/secureRoute";
+import { z } from "zod";
 
-export async function action({ params }: { params: { id: string } }) {
-  try {
-    await prisma.user.update({
-      where: { id: params.id },
-      data: {
-        banned: false,
-        banReason: null,
-        banExpires: null,
-      },
-    });
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ params }) => {
+    try {
+      await prisma.user.update({
+        where: { id: params.id },
+        data: {
+          banned: false,
+          banReason: null,
+          banExpires: null,
+        },
+      });
 
-    return { success: true, message: "User unbanned successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to unban user" };
-  }
-}
+      return { success: true, message: "User unbanned successfully" };
+    } catch (error) {
+      return { success: false, error: "Failed to unban user" };
+    }
+  },
+});
 
 export default function UserUnbanPage() {
   const { user } = useOutletContext<OutletContext>();

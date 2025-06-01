@@ -1,4 +1,5 @@
 import { Form, redirect, useLoaderData } from "react-router";
+import z from "zod";
 import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
@@ -9,6 +10,9 @@ export const action = createProtectedAction({
     action: "accept",
     subject: "Organization:Members:Invite",
   },
+  paramValidation: z.object({
+    inviteId: z.string(),
+  }),
   function: async ({ request, params }) => {
     const inviteId = params.inviteId;
 
@@ -49,12 +53,14 @@ export const action = createProtectedAction({
   },
 });
 
-// TODO: Validate params first
 export const loader = createProtectedLoader({
   permissions: {
     action: "accept",
     subject: "Organization:Members:Invite",
   },
+  paramValidation: z.object({
+    inviteId: z.string(),
+  }),
   function: async ({ params, request }) => {
     const inviteId = params.inviteId;
 

@@ -1,41 +1,95 @@
-import type { ActionFunctionArgs } from "react-router";
-
-import type { LoaderFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { ensureCanWithIdentity } from "./permissions.server";
 import { getUserInformation } from "./identity.server";
 import type { Subject } from "@casl/ability";
+import { z } from "zod";
 
+// Types for permission checking
 type PermissionCheck = {
   action: string;
   subject: string | Subject;
 };
 
-type ProtectedLoaderConfig<T = any> = {
-  permissions: PermissionCheck;
+// Types for strict parameter validation
+type StrictParams<T> = {
+  [K in keyof T]: T[K];
+};
+
+type Identity = Awaited<ReturnType<typeof getUserInformation>>;
+
+// Base configuration type for protected routes
+type BaseProtectedConfig<T, P extends z.ZodSchema | undefined = undefined> = {
+  permissions?: PermissionCheck;
+  paramValidation?: P;
   function: (
-    args: LoaderFunctionArgs & { identity: Awaited<ReturnType<typeof getUserInformation>> }
+    args: Omit<LoaderFunctionArgs, "params"> & {
+      identity: Identity;
+      params: P extends z.ZodSchema ? StrictParams<z.infer<P>> : null;
+    }
   ) => T;
 };
 
-export function createProtectedLoader<T>(config: ProtectedLoaderConfig<T>) {
+// Loader specific configuration
+type ProtectedLoaderConfig<
+  T = any,
+  P extends z.ZodSchema | undefined = undefined,
+> = BaseProtectedConfig<T, P>;
+
+// Action specific configuration
+type ProtectedActionConfig<
+  T = any,
+  P extends z.ZodSchema | undefined = undefined,
+> = BaseProtectedConfig<T, P>;
+
+/**
+ * Creates a protected loader function that validates permissions and parameters
+ */
+export function createProtectedLoader<T, P extends z.ZodSchema | undefined = undefined>(
+  config: ProtectedLoaderConfig<T, P>
+) {
   return async (args: LoaderFunctionArgs) => {
-    const identity = await getUserInformation(args.request);
-    ensureCanWithIdentity(identity, config.permissions.action, config.permissions.subject);
-    return await config.function({ ...args, identity });
+    const parsedParams = validateParams(args.params, config.paramValidation);
+    const identity = await validateIdentity(args.request, config.permissions);
+    const { params: _, ...rest } = args;
+    return await config.function({ ...rest, identity, params: parsedParams.data });
   };
 }
 
-type ProtectedActionConfig<T = any> = {
-  permissions: PermissionCheck;
-  function: (
-    args: ActionFunctionArgs & { identity: Awaited<ReturnType<typeof getUserInformation>> }
-  ) => T;
-};
-
-export function createProtectedAction<T>(config: ProtectedActionConfig<T>) {
+/**
+ * Creates a protected action function that validates permissions and parameters
+ */
+export function createProtectedAction<T, P extends z.ZodSchema | undefined = undefined>(
+  config: ProtectedActionConfig<T, P>
+) {
   return async (args: ActionFunctionArgs) => {
-    const identity = await getUserInformation(args.request);
-    ensureCanWithIdentity(identity, config.permissions.action, config.permissions.subject);
-    return await config.function({ ...args, identity });
+    const parsedParams = validateParams(args.params, config.paramValidation);
+    const identity = await validateIdentity(args.request, config.permissions);
+    const { params: _, ...rest } = args;
+    return await config.function({ ...rest, identity, params: parsedParams.data });
   };
+}
+
+// Helper functions
+async function validateIdentity(
+  request: Request,
+  permissions?: PermissionCheck
+): Promise<Identity> {
+  const identity = await getUserInformation(request);
+  if (permissions) {
+    ensureCanWithIdentity(identity, permissions.action, permissions.subject);
+  }
+  return identity;
+}
+
+function validateParams(params: any, schema?: z.ZodSchema) {
+  if (!schema) {
+    return { data: null };
+  }
+
+  const parsed = schema.safeParse(params);
+  if (!parsed.success) {
+    throw new Error(parsed.error.message);
+  }
+
+  return { data: parsed.data };
 }

@@ -9,38 +9,44 @@ import { Dialog } from "~/components/ui/dialog";
 import { useState, useEffect } from "react";
 import type { OutletContext } from "./user.detail";
 import { Checkbox } from "~/components/ui/checkbox";
+import { createProtectedAction } from "~/lib/secureRoute";
 
 const roleSchema = z.object({
   roles: z.array(z.enum(["user", "admin"])).min(1, "At least one role is required"),
 });
 
-export async function action({ request, params }: { request: Request; params: { id: string } }) {
-  try {
-    const formData = await request.formData();
-    const roles = formData.getAll("roles") as string[];
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ request, params }) => {
+    try {
+      const formData = await request.formData();
+      const roles = formData.getAll("roles") as string[];
 
-    const validatedData = roleSchema.parse({ roles });
+      const validatedData = roleSchema.parse({ roles });
 
-    await auth.api.setRole({
-      headers: request.headers,
-      body: {
-        userId: params.id,
-        role: validatedData.roles,
-      },
-    });
+      await auth.api.setRole({
+        headers: request.headers,
+        body: {
+          userId: params.id,
+          role: validatedData.roles,
+        },
+      });
 
-    return { success: true, message: "User roles updated successfully" };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: "Validation failed",
-        fieldErrors: error.flatten().fieldErrors,
-      };
+      return { success: true, message: "User roles updated successfully" };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return {
+          success: false,
+          error: "Validation failed",
+          fieldErrors: error.flatten().fieldErrors,
+        };
+      }
+      return { success: false, error: "Failed to update user roles" };
     }
-    return { success: false, error: "Failed to update user roles" };
-  }
-}
+  },
+});
 
 export default function UserSetRolePage() {
   const { user } = useOutletContext<OutletContext>();

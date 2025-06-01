@@ -6,18 +6,25 @@ import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog
 import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import type { OutletContext } from "./user.detail";
+import { createProtectedAction } from "~/lib/secureRoute";
+import { z } from "zod";
 
-export async function action({ params }: { params: { id: string } }) {
-  try {
-    await prisma.user.delete({
-      where: { id: params.id },
-    });
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ params }) => {
+    try {
+      await prisma.user.delete({
+        where: { id: params.id },
+      });
 
-    return { success: true, message: "User deleted successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to delete user" };
-  }
-}
+      return { success: true, message: "User deleted successfully" };
+    } catch (error) {
+      return { success: false, error: "Failed to delete user" };
+    }
+  },
+});
 
 export default function UserDeletePage() {
   const { user } = useOutletContext<OutletContext>();

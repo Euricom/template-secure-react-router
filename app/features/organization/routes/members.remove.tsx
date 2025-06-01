@@ -11,55 +11,60 @@ import { Dialog } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
-import type { Route } from "./+types/members";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import z from "zod";
 
-// TODO: Move to secureRoute, validate params first
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: { memberId: string; organizationId: string };
-}) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "remove", "Organization:Members");
+export const action = createProtectedAction({
+  permissions: {
+    action: "remove",
+    subject: "Organization:Members",
+  },
+  paramValidation: z.object({
+    memberId: z.string(),
+    organizationId: z.string(),
+  }),
+  function: async ({ params, request }) => {
+    await auth.api.removeMember({
+      headers: request.headers,
+      body: {
+        memberIdOrEmail: params.memberId,
+        organizationId: params.organizationId,
+      },
+    });
 
-  await auth.api.removeMember({
-    headers: request.headers,
-    body: {
-      memberIdOrEmail: params.memberId,
-      organizationId: params.organizationId,
-    },
-  });
+    return { success: true, message: "Member removed successfully" };
+  },
+});
 
-  return { success: true, message: "Member removed successfully" };
-}
+export const loader = createProtectedLoader({
+  permissions: {
+    action: "remove",
+    subject: "Organization:Members",
+  },
+  paramValidation: z.object({
+    memberId: z.string(),
+  }),
+  function: async ({ params }) => {
+    const memberId = params.memberId;
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "remove", "Organization:Members");
-
-  const memberId = params.memberId;
-  const member = await prisma.member.findUnique({
-    where: { id: memberId },
-
-    include: {
-      user: {
-        select: {
-          name: true,
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
         },
       },
-    },
-  });
-  return {
-    member: {
-      id: member?.id,
-      name: member?.user.name ?? "",
-    },
-  };
-}
+    });
+    return {
+      member: {
+        id: member?.id,
+        name: member?.user.name ?? "",
+      },
+    };
+  },
+});
 
 export default function MembersRemove() {
   const { member } = useLoaderData<typeof loader>();

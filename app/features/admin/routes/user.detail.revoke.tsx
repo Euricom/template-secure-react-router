@@ -14,35 +14,36 @@ import { Dialog } from "~/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { auth } from "~/lib/auth";
 import type { OutletContext } from "./user.detail";
+import { createProtectedAction } from "~/lib/secureRoute";
+import { z } from "zod";
 
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: { sessionId: string };
-}) {
-  try {
-    const session = await prisma.session.findUnique({
-      where: { id: params.sessionId },
-    });
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    sessionId: z.string(),
+  }),
+  function: async ({ request, params }) => {
+    try {
+      const session = await prisma.session.findUnique({
+        where: { id: params.sessionId },
+      });
 
-    if (!session) {
-      throw new Response("Session not found", { status: 404 });
+      if (!session) {
+        throw new Response("Session not found", { status: 404 });
+      }
+
+      await auth.api.revokeUserSession({
+        headers: request.headers,
+        body: {
+          sessionToken: session.token,
+        },
+      });
+
+      return { success: true, message: "Session revoked successfully" };
+    } catch (error) {
+      return { success: false, error: "Failed to revoke session" };
     }
-
-    await auth.api.revokeUserSession({
-      headers: request.headers,
-      body: {
-        sessionToken: session.token,
-      },
-    });
-
-    return { success: true, message: "Session revoked successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to revoke session" };
-  }
-}
+  },
+});
 
 export default function UserRevokeSessionPage() {
   const { user } = useOutletContext<OutletContext>();

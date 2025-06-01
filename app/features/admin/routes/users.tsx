@@ -8,51 +8,54 @@ import prisma from "~/lib/prismaClient";
 import { Prisma } from "@prisma/client";
 import { Can } from "~/components/providers/permission.provider";
 import { Button } from "~/components/ui/button";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
-export async function loader({ request }: { request: Request }) {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1");
-  const limit = parseInt(url.searchParams.get("limit") || "10");
-  const search = url.searchParams.get("search") || "";
-  const sortBy = url.searchParams.get("sortBy") || "createdAt";
-  const sortDirection = (url.searchParams.get("sortDirection") || "desc") as "asc" | "desc";
+export const loader = createProtectedLoader({
+  function: async ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const search = url.searchParams.get("search") || "";
+    const sortBy = url.searchParams.get("sortBy") || "createdAt";
+    const sortDirection = (url.searchParams.get("sortDirection") || "desc") as "asc" | "desc";
 
-  // Build the where clause for searching
-  const where = search
-    ? {
-        OR: [
-          { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
-          { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
-          { role: { contains: search, mode: Prisma.QueryMode.insensitive } },
-        ],
-      }
-    : {};
+    // Build the where clause for searching
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { role: { contains: search, mode: Prisma.QueryMode.insensitive } },
+          ],
+        }
+      : {};
 
-  // Get total count for pagination
-  const total = await prisma.user.count({ where });
+    // Get total count for pagination
+    const total = await prisma.user.count({ where });
 
-  // Get paginated and sorted users
-  const users = await prisma.user.findMany({
-    where,
-    orderBy: {
-      [sortBy]: sortDirection,
-    },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+    // Get paginated and sorted users
+    const users = await prisma.user.findMany({
+      where,
+      orderBy: {
+        [sortBy]: sortDirection,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
 
-  return {
-    users: users.map((user) => ({
-      ...user,
-      role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
-    })),
-    total,
-    page,
-    limit,
-    sortBy,
-    sortDirection,
-  };
-}
+    return {
+      users: users.map((user) => ({
+        ...user,
+        role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
+      })),
+      total,
+      page,
+      limit,
+      sortBy,
+      sortDirection,
+    };
+  },
+});
 
 export default function UsersPage() {
   const { users, total, page, limit, sortBy, sortDirection } = useLoaderData<typeof loader>();

@@ -9,6 +9,7 @@ import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog
 import { Dialog } from "~/components/ui/dialog";
 import { useState, useEffect } from "react";
 import type { OutletContext } from "./user.detail";
+import { createProtectedAction } from "~/lib/secureRoute";
 
 const banSchema = z.object({
   banReason: z.string().min(1, "Ban reason is required").max(500, "Ban reason is too long"),
@@ -26,42 +27,47 @@ const banSchema = z.object({
     ),
 });
 
-export async function action({ request, params }: { request: Request; params: { id: string } }) {
-  try {
-    const formData = await request.formData();
-    const banData = {
-      banReason: formData.get("banReason") as string,
-      banExpires: formData.get("banExpires") as string,
-    };
-
-    const validatedData = banSchema.parse(banData);
-
-    // Calculate ban duration in seconds
-    const banExpiresIn = validatedData.banExpires
-      ? Math.floor((new Date(validatedData.banExpires).getTime() - Date.now()) / 1000)
-      : undefined;
-
-    await auth.api.banUser({
-      headers: request.headers,
-      body: {
-        userId: params.id,
-        banReason: validatedData.banReason,
-        banExpiresIn,
-      },
-    });
-
-    return { success: true, message: "User banned successfully" };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: "Validation failed",
-        fieldErrors: error.flatten().fieldErrors,
+export const action = createProtectedAction({
+  paramValidation: z.object({
+    id: z.string(),
+  }),
+  function: async ({ request, params }) => {
+    try {
+      const formData = await request.formData();
+      const banData = {
+        banReason: formData.get("banReason") as string,
+        banExpires: formData.get("banExpires") as string,
       };
+
+      const validatedData = banSchema.parse(banData);
+
+      // Calculate ban duration in seconds
+      const banExpiresIn = validatedData.banExpires
+        ? Math.floor((new Date(validatedData.banExpires).getTime() - Date.now()) / 1000)
+        : undefined;
+
+      await auth.api.banUser({
+        headers: request.headers,
+        body: {
+          userId: params.id,
+          banReason: validatedData.banReason,
+          banExpiresIn,
+        },
+      });
+
+      return { success: true, message: "User banned successfully" };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return {
+          success: false,
+          error: "Validation failed",
+          fieldErrors: error.flatten().fieldErrors,
+        };
+      }
+      return { success: false, error: "Failed to ban user" };
     }
-    return { success: false, error: "Failed to ban user" };
-  }
-}
+  },
+});
 
 export default function UserBanPage() {
   const { user } = useOutletContext<OutletContext>();

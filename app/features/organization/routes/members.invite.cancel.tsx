@@ -12,12 +12,16 @@ import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import z from "zod";
 
 export const action = createProtectedAction({
   permissions: {
     action: "cancel",
     subject: "Organization:Members:Invite",
   },
+  paramValidation: z.object({
+    inviteId: z.string(),
+  }),
   function: async ({ request, params }) => {
     const inviteId = params.inviteId;
 
@@ -41,6 +45,9 @@ export const loader = createProtectedLoader({
     action: "cancel",
     subject: "Organization:Members:Invite",
   },
+  paramValidation: z.object({
+    inviteId: z.string(),
+  }),
   function: async ({ params }) => {
     const inviteId = params.inviteId;
 

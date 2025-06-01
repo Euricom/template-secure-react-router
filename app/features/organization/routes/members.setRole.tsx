@@ -11,45 +11,46 @@ import { Dialog } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import prisma from "~/lib/prismaClient";
 import { auth } from "~/lib/auth";
-import { getUserInformation } from "~/lib/identity.server";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import { createProtectedLoader } from "~/lib/secureRoute";
+import { z } from "zod";
+import { createProtectedAction } from "~/lib/secureRoute";
 
-// TODO: Move to secureRoute, validate params first
-export async function action({
-  request,
-  params,
-}: {
-  request: Request;
-  params: { memberId: string };
-}) {
-  const identity = await getUserInformation(request);
-  ensureCanWithIdentity(identity, "setRole", "Organization:Members");
+export const action = createProtectedAction({
+  permissions: {
+    action: "setRole",
+    subject: "Organization:Members",
+  },
+  paramValidation: z.object({
+    memberId: z.string(),
+  }),
+  function: async ({ params, request }) => {
+    const formData = await request.formData();
+    const role = formData.get("role") as string;
 
-  const formData = await request.formData();
-  const role = formData.get("role") as string;
+    if (role !== "admin" && role !== "member" && role !== "owner") {
+      return { success: false, error: "Invalid role" };
+    }
 
-  if (role !== "admin" && role !== "member" && role !== "owner") {
-    return { success: false, error: "Invalid role" };
-  }
+    await auth.api.updateMemberRole({
+      headers: request.headers,
+      body: {
+        memberId: params.memberId,
+        role,
+      },
+    });
 
-  await auth.api.updateMemberRole({
-    headers: request.headers,
-    body: {
-      memberId: params.memberId,
-      role,
-    },
-  });
+    return { success: true, message: "Member role updated successfully" };
+  },
+});
 
-  return { success: true, message: "Member role updated successfully" };
-}
-
-// TODO: Validate params first
 export const loader = createProtectedLoader({
   permissions: {
     action: "setRole",
     subject: "Organization:Members",
   },
+  paramValidation: z.object({
+    memberId: z.string(),
+  }),
   function: async ({ params }) => {
     const memberId = params.memberId;
     const member = await prisma.member.findUnique({
