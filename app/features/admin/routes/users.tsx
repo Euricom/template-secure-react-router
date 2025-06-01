@@ -9,23 +9,24 @@ import { Prisma } from "@prisma/client";
 import { Can } from "~/components/providers/permission.provider";
 import { Button } from "~/components/ui/button";
 import { createProtectedLoader } from "~/lib/secureRoute";
+import { z } from "zod";
 
 export const loader = createProtectedLoader({
-  function: async ({ request }) => {
-    const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const limit = parseInt(url.searchParams.get("limit") || "10");
-    const search = url.searchParams.get("search") || "";
-    const sortBy = url.searchParams.get("sortBy") || "createdAt";
-    const sortDirection = (url.searchParams.get("sortDirection") || "desc") as "asc" | "desc";
-
+  queryValidation: z.object({
+    page: z.number().min(1).default(1),
+    limit: z.number().min(1).default(10),
+    search: z.string().optional(),
+    sortBy: z.string().optional().default("createdAt"),
+    sortDirection: z.enum(["asc", "desc"]).optional(),
+  }),
+  function: async ({ query }) => {
     // Build the where clause for searching
-    const where = search
+    const where = query.search
       ? {
           OR: [
-            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
-            { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
-            { role: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { name: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
+            { email: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
+            { role: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : {};
@@ -37,10 +38,10 @@ export const loader = createProtectedLoader({
     const users = await prisma.user.findMany({
       where,
       orderBy: {
-        [sortBy]: sortDirection,
+        [query.sortBy]: query.sortDirection,
       },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
     });
 
     return {
@@ -49,10 +50,10 @@ export const loader = createProtectedLoader({
         role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
       })),
       total,
-      page,
-      limit,
-      sortBy,
-      sortDirection,
+      page: query.page,
+      limit: query.limit,
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
     };
   },
 });
