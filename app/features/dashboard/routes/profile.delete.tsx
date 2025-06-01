@@ -1,5 +1,6 @@
+import { redirect } from "react-router";
 import { auth } from "~/lib/auth";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   function: async ({ request }) => {
@@ -15,5 +16,11 @@ export const action = createProtectedAction({
     } catch (error) {
       return { success: false, error: "Failed to delete account" };
     }
+  },
+});
+
+export const loader = createProtectedLoader({
+  function: async () => {
+    return redirect("/app/profile");
   },
 });

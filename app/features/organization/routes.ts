@@ -12,7 +12,10 @@ export const organizationRoutes = [
       route("join", "./routes/onboarding.join.tsx"),
     ]),
     route("/onboarding/join/:inviteId", "./routes/onboarding.join.byId.tsx"),
-    route("/", "./routes/general.tsx"),
+    route("/", "./routes/organization.tsx", [
+      route("edit", "./routes/organization.update.tsx"),
+      route("delete", "./routes/organization.delete.tsx"),
+    ]),
     route("/members", "./routes/members.tsx", [
       route(":memberId/remove", "./routes/members.remove.tsx"),
       route(":memberId/set-role", "./routes/members.setRole.tsx"),

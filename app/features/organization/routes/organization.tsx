@@ -1,11 +1,4 @@
-import {
-  useLoaderData,
-  useActionData,
-  useNavigation,
-  Form,
-  redirect,
-  type ActionFunctionArgs,
-} from "react-router";
+import { useLoaderData, useNavigation, Form, type ActionFunctionArgs } from "react-router";
 import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";
@@ -27,64 +20,60 @@ import {
 } from "~/components/ui/alert-dialog";
 import { useState } from "react";
 import { auth } from "~/lib/auth";
-import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { getUserInformation } from "~/lib/identity.server";
+
 import { createProtectedLoader } from "~/lib/secureRoute";
 
-const orgNameSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-});
+// const orgNameSchema = z.object({
+//   name: z.string().min(1, "Name is required"),
+// });
 
 // TODO: Move to secureRoute, split up into multiple actions
 export async function action({ request }: ActionFunctionArgs) {
-  const identity = await getUserInformation(request);
+  // const identity = await getUserInformation(request);
 
-  const formData = await request.formData();
-  const intent = formData.get("intent");
-  const name = formData.get("name") as string | undefined;
-  const organizationId = formData.get("organizationId") as string;
+  // const formData = await request.formData();
+  // const intent = formData.get("intent");
+  // // const name = formData.get("name") as string | undefined;
+  // const organizationId = formData.get("organizationId") as string;
 
-  if (intent === "edit") {
-    ensureCanWithIdentity(identity, "update", "Organization");
+  // if (intent === "edit") {
+  //   ensureCanWithIdentity(identity, "update", "Organization");
 
-    try {
-      const validated = orgNameSchema.parse({ name });
-      // TODO: Replace with actual updateOrganization API if available
-      if (typeof auth.api.updateOrganization !== "function") {
-        return { error: "Organization update API not implemented" };
-      }
-      await auth.api.updateOrganization({
-        headers: request.headers,
-        body: {
-          organizationId,
-          data: {
-            name: validated.name,
-          },
-        },
-      });
-      return { success: true };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return { errors: error.flatten().fieldErrors };
-      }
-      return { error: "Failed to update organization" };
-    }
-  }
+  //   try {
+  //     const validated = orgNameSchema.parse({ name });
 
-  if (intent === "delete") {
-    ensureCanWithIdentity(identity, "delete", "Organization");
+  //     await auth.api.updateOrganization({
+  //       headers: request.headers,
+  //       body: {
+  //         organizationId,
+  //         data: {
+  //           name: validated.name,
+  //         },
+  //       },
+  //     });
+  //     return { success: true };
+  //   } catch (error) {
+  //     if (error instanceof z.ZodError) {
+  //       return { errors: error.flatten().fieldErrors };
+  //     }
+  //     return { error: "Failed to update organization" };
+  //   }
+  // }
 
-    if (typeof auth.api.deleteOrganization !== "function") {
-      return { error: "Organization delete API not implemented" };
-    }
-    await auth.api.deleteOrganization({
-      headers: request.headers,
-      body: {
-        organizationId,
-      },
-    });
-    return redirect("/app/organization/select");
-  }
+  // if (intent === "delete") {
+  //   ensureCanWithIdentity(identity, "delete", "Organization");
+
+  //   if (typeof auth.api.deleteOrganization !== "function") {
+  //     return { error: "Organization delete API not implemented" };
+  //   }
+  //   await auth.api.deleteOrganization({
+  //     headers: request.headers,
+  //     body: {
+  //       organizationId,
+  //     },
+  //   });
+  //   return redirect("/app/organization/select");
+  // }
 
   return null;
 }
@@ -107,7 +96,6 @@ export const loader = createProtectedLoader({
 
 export default function OrganizationGeneral() {
   const { activeOrg } = useLoaderData<{ activeOrg: { id: string; name: string; slug: string } }>();
-  const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -119,14 +107,15 @@ export default function OrganizationGeneral() {
           <CardTitle>Organization Details</CardTitle>
           <CardDescription>Manage your organization settings.</CardDescription>
         </CardHeader>
-        <Form method="post" autoComplete="off">
+        <Form method="post" action="/app/organization/edit" autoComplete="off">
+          {/* TODO: add error feedback from action */}
           <CardContent className="space-y-4 py-4">
             <InputWithLabel
               label="Name"
               id="name"
               name="name"
               defaultValue={activeOrg.name}
-              error={actionData?.errors?.name?.[0]}
+              // error={actionData?.errors?.name?.[0]}
               autoFocus
             />
             <input type="hidden" name="organizationId" value={activeOrg.id} />
@@ -136,10 +125,12 @@ export default function OrganizationGeneral() {
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
-            {actionData?.error && (
+            {/* TODO: add error feedback from action */}
+
+            {/* {actionData?.error && (
               <div className="text-destructive text-sm text-center">{actionData.error}</div>
-            )}
-            {actionData?.success && <div className="text-success text-sm text-center">Saved!</div>}
+            )} */}
+            {/* {actionData?.success && <div className="text-success text-sm text-center">Saved!</div>} */}
           </CardFooter>
         </Form>
       </Card>
@@ -172,7 +163,7 @@ export default function OrganizationGeneral() {
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <Form method="post">
+          <Form method="post" action="/app/organization/delete">
             <input type="hidden" name="organizationId" value={activeOrg.id} />
             <input type="hidden" name="intent" value="delete" />
             <AlertDialogFooter>

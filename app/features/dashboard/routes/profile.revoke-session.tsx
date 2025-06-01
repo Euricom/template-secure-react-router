@@ -1,7 +1,8 @@
+import { redirect } from "react-router";
 import { z } from "zod";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   formValidation: z.object({
@@ -35,5 +36,11 @@ export const action = createProtectedAction({
     } catch (error) {
       return { success: false, error: "Failed to revoke session" };
     }
+  },
+});
+
+export const loader = createProtectedLoader({
+  function: async () => {
+    return redirect("/app/profile");
   },
 });
