@@ -24,11 +24,17 @@ export const action = createProtectedAction({
     organizationId: z.string(),
   }),
   function: async ({ params, request }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+
+    const { memberId, organizationId } = params.data;
+
     await auth.api.removeMember({
       headers: request.headers,
       body: {
-        memberIdOrEmail: params.memberId,
-        organizationId: params.organizationId,
+        memberIdOrEmail: memberId,
+        organizationId,
       },
     });
 
@@ -45,7 +51,12 @@ export const loader = createProtectedLoader({
     memberId: z.string(),
   }),
   function: async ({ params }) => {
-    const memberId = params.memberId;
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+
+    const { memberId } = params.data;
+
     const member = await prisma.member.findUnique({
       where: { id: memberId },
 

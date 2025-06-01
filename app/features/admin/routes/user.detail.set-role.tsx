@@ -11,40 +11,33 @@ import type { OutletContext } from "./user.detail";
 import { Checkbox } from "~/components/ui/checkbox";
 import { createProtectedAction } from "~/lib/secureRoute";
 
-const roleSchema = z.object({
-  roles: z.array(z.enum(["user", "admin"])).min(1, "At least one role is required"),
-});
-
 export const action = createProtectedAction({
   paramValidation: z.object({
     id: z.string(),
   }),
-  function: async ({ request, params }) => {
-    try {
-      const formData = await request.formData();
-      const roles = formData.getAll("roles") as string[];
-
-      const validatedData = roleSchema.parse({ roles });
-
-      await auth.api.setRole({
-        headers: request.headers,
-        body: {
-          userId: params.id,
-          role: validatedData.roles,
-        },
-      });
-
-      return { success: true, message: "User roles updated successfully" };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return {
-          success: false,
-          error: "Validation failed",
-          fieldErrors: error.flatten().fieldErrors,
-        };
-      }
-      return { success: false, error: "Failed to update user roles" };
+  formValidation: z.object({
+    roles: z.array(z.enum(["user", "admin"])).min(1, "At least one role is required"),
+  }),
+  function: async ({ request, params, form }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
     }
+    const { id: userId } = params.data;
+
+    if (form.error) {
+      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+    }
+    const { roles } = form.data;
+
+    await auth.api.setRole({
+      headers: request.headers,
+      body: {
+        userId,
+        role: roles,
+      },
+    });
+
+    return { success: true, message: "User roles updated successfully" };
   },
 });
 

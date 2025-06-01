@@ -12,16 +12,22 @@ import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth";
 import { InputWithLabel } from "~/components/input-with-label";
 import { createProtectedAction } from "~/lib/secureRoute";
+import z from "zod";
 
 export const action = createProtectedAction({
   permissions: {
     action: "create",
     subject: "Organization:Members:Invite",
   },
-  function: async ({ request }) => {
-    const formData = await request.formData();
-    const email = formData.get("email") as string;
-    const role = formData.get("role") as string;
+  formValidation: z.object({
+    email: z.string().email("Invalid email address"),
+    role: z.enum(["admin", "member", "owner"]),
+  }),
+  function: async ({ request, form }) => {
+    if (form.error) {
+      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+    }
+    const { email, role } = form.data;
 
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) {

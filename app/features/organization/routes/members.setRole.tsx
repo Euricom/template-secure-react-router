@@ -23,18 +23,24 @@ export const action = createProtectedAction({
   paramValidation: z.object({
     memberId: z.string(),
   }),
-  function: async ({ params, request }) => {
-    const formData = await request.formData();
-    const role = formData.get("role") as string;
-
-    if (role !== "admin" && role !== "member" && role !== "owner") {
-      return { success: false, error: "Invalid role" };
+  formValidation: z.object({
+    role: z.enum(["admin", "member", "owner"]),
+  }),
+  function: async ({ params, request, form }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
     }
+    const { memberId } = params.data;
+
+    if (form.error) {
+      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+    }
+    const { role } = form.data;
 
     await auth.api.updateMemberRole({
       headers: request.headers,
       body: {
-        memberId: params.memberId,
+        memberId,
         role,
       },
     });
@@ -52,7 +58,12 @@ export const loader = createProtectedLoader({
     memberId: z.string(),
   }),
   function: async ({ params }) => {
-    const memberId = params.memberId;
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+
+    const { memberId } = params.data;
+
     const member = await prisma.member.findUnique({
       where: { id: memberId },
 
@@ -99,7 +110,9 @@ export default function MembersSetRole() {
           <DialogTitle>Update Member Role</DialogTitle>
         </DialogHeader>
         <Form method="post" className="space-y-4">
-          {actionData?.error && <div className="text-destructive text-sm">{actionData.error}</div>}
+          {actionData?.fieldErrors && (
+            <div className="text-destructive text-sm">{actionData.fieldErrors.role}</div>
+          )}
           <input type="hidden" name="intent" value="update-role" />
           <input type="hidden" name="memberId" value={member.id} />
           <div>

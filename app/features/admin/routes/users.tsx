@@ -20,13 +20,18 @@ export const loader = createProtectedLoader({
     sortDirection: z.enum(["asc", "desc"]).optional(),
   }),
   function: async ({ query }) => {
+    if (query.error) {
+      throw new Response(query.error.message, { status: 400 });
+    }
+    const { page, limit, search, sortBy, sortDirection } = query.data;
+
     // Build the where clause for searching
-    const where = query.search
+    const where = search
       ? {
           OR: [
-            { name: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
-            { email: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
-            { role: { contains: query.search, mode: Prisma.QueryMode.insensitive } },
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { role: { contains: search, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : {};
@@ -38,10 +43,10 @@ export const loader = createProtectedLoader({
     const users = await prisma.user.findMany({
       where,
       orderBy: {
-        [query.sortBy]: query.sortDirection,
+        [sortBy]: sortDirection,
       },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     return {
@@ -50,10 +55,10 @@ export const loader = createProtectedLoader({
         role: user.role ? user.role.split(",").map((role) => role.trim()) : null,
       })),
       total,
-      page: query.page,
-      limit: query.limit,
-      sortBy: query.sortBy,
-      sortDirection: query.sortDirection,
+      page,
+      limit,
+      sortBy,
+      sortDirection,
     };
   },
 });

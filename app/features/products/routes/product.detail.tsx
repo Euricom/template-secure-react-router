@@ -17,8 +17,13 @@ export const loader = createProtectedLoader({
     productId: z.string(),
   }),
   function: async ({ params }) => {
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+    const { productId } = params.data;
+
     const product = await prisma.product.findUnique({
-      where: { id: params.productId },
+      where: { id: productId },
     });
 
     if (!product) {

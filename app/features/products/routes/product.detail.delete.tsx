@@ -20,8 +20,13 @@ export const action = createProtectedAction({
     productId: z.string(),
   }),
   function: async ({ params, identity }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+    const { productId } = params.data;
+
     const product = await prisma.product.findUnique({
-      where: { id: params.productId },
+      where: { id: productId },
     });
 
     if (!product) {
@@ -32,7 +37,7 @@ export const action = createProtectedAction({
 
     try {
       await prisma.product.delete({
-        where: { id: params.productId },
+        where: { id: productId },
       });
 
       return { success: true, message: "Product deleted successfully" };

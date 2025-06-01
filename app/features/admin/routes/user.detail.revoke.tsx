@@ -22,9 +22,14 @@ export const action = createProtectedAction({
     sessionId: z.string(),
   }),
   function: async ({ request, params }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+    const { sessionId } = params.data;
+
     try {
       const session = await prisma.session.findUnique({
-        where: { id: params.sessionId },
+        where: { id: sessionId },
       });
 
       if (!session) {

@@ -14,6 +14,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const organizationId = formData.get("organizationId") as string;
 
+  // TODO: add form validation
+
   if (organizationId) {
     // Set active organization
     await auth.api.setActiveOrganization({

@@ -23,9 +23,15 @@ export const action = createProtectedAction({
     action: "create",
     subject: "Organization",
   },
-  function: async ({ request, identity }) => {
-    const formData = await request.formData();
-    const name = formData.get("name") as string;
+  formValidation: z.object({
+    name: z.string().min(1, "Name is required"),
+  }),
+  function: async ({ request, identity, form }) => {
+    if (form.error) {
+      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+    }
+    const { name } = form.data;
+
     try {
       const validatedData = onboardingSchema.parse({ name });
 

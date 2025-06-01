@@ -14,10 +14,15 @@ export const action = createProtectedAction({
     id: z.string(),
   }),
   function: async ({ params }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+    const { id: userId } = params.data;
+
     try {
       // Delete all sessions for the user
       await prisma.session.deleteMany({
-        where: { userId: params.id },
+        where: { userId },
       });
 
       return { success: true, message: "All sessions revoked successfully" };

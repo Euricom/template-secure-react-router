@@ -11,61 +11,51 @@ import { useState, useEffect } from "react";
 import type { OutletContext } from "./user.detail";
 import { createProtectedAction } from "~/lib/secureRoute";
 
-const banSchema = z.object({
-  banReason: z.string().min(1, "Ban reason is required").max(500, "Ban reason is too long"),
-  banExpires: z
-    .string()
-    .optional()
-    .refine(
-      (date) => {
-        if (!date) return true;
-        const selectedDate = new Date(date);
-        const now = new Date();
-        return selectedDate > now;
-      },
-      { message: "Ban expiration date must be in the future" }
-    ),
-});
-
 export const action = createProtectedAction({
   paramValidation: z.object({
     id: z.string(),
   }),
-  function: async ({ request, params }) => {
-    try {
-      const formData = await request.formData();
-      const banData = {
-        banReason: formData.get("banReason") as string,
-        banExpires: formData.get("banExpires") as string,
-      };
-
-      const validatedData = banSchema.parse(banData);
-
-      // Calculate ban duration in seconds
-      const banExpiresIn = validatedData.banExpires
-        ? Math.floor((new Date(validatedData.banExpires).getTime() - Date.now()) / 1000)
-        : undefined;
-
-      await auth.api.banUser({
-        headers: request.headers,
-        body: {
-          userId: params.id,
-          banReason: validatedData.banReason,
-          banExpiresIn,
+  formValidation: z.object({
+    banReason: z.string().min(1, "Ban reason is required").max(500, "Ban reason is too long"),
+    banExpires: z
+      .string()
+      .optional()
+      .refine(
+        (date) => {
+          if (!date) return true;
+          const selectedDate = new Date(date);
+          const now = new Date();
+          return selectedDate > now;
         },
-      });
-
-      return { success: true, message: "User banned successfully" };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return {
-          success: false,
-          error: "Validation failed",
-          fieldErrors: error.flatten().fieldErrors,
-        };
-      }
-      return { success: false, error: "Failed to ban user" };
+        { message: "Ban expiration date must be in the future" }
+      ),
+  }),
+  function: async ({ request, params, form }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
     }
+    const { id } = params.data;
+
+    if (form.error) {
+      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+    }
+    const { banReason, banExpires } = form.data;
+
+    // Calculate ban duration in seconds
+    const banExpiresIn = banExpires
+      ? Math.floor((new Date(banExpires).getTime() - Date.now()) / 1000)
+      : undefined;
+
+    await auth.api.banUser({
+      headers: request.headers,
+      body: {
+        userId: id,
+        banReason: banReason,
+        banExpiresIn,
+      },
+    });
+
+    return { success: true, message: "User banned successfully" };
   },
 });
 

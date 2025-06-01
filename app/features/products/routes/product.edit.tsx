@@ -17,9 +17,22 @@ export const action = createProtectedAction({
   paramValidation: z.object({
     productId: z.string(),
   }),
-  function: async ({ request, params, identity }) => {
+  formValidation: z.object({
+    name: z.string().min(1, "Name is required"),
+  }),
+  function: async ({ params, identity, form }) => {
+    if (params.error) {
+      return { error: "Failed to update product" };
+    }
+    const { productId } = params.data;
+
+    if (form.error) {
+      return { error: "Failed to update product", fieldErrors: form.fieldErrors };
+    }
+    const { name } = form.data;
+
     const product = await prisma.product.findUnique({
-      where: { id: params.productId },
+      where: { id: productId },
     });
 
     if (!product) {
@@ -28,20 +41,17 @@ export const action = createProtectedAction({
 
     ensureCanWithIdentity(identity, "update", subject("Product", product));
 
-    const formData = await request.formData();
-    const name = formData.get("name") as string;
-
     try {
       const validatedData = productSchema.parse({ name });
 
       await prisma.product.update({
-        where: { id: params.productId },
+        where: { id: productId },
         data: {
           name: validatedData.name,
         },
       });
 
-      return redirect(`/app/products/${params.productId}`);
+      return redirect(`/app/products/${productId}`);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return { errors: error.flatten().fieldErrors };
@@ -60,8 +70,14 @@ export const loader = createProtectedLoader({
     productId: z.string(),
   }),
   function: async ({ params, identity }) => {
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+
+    const { productId } = params.data;
+
     const product = await prisma.product.findUnique({
-      where: { id: params.productId },
+      where: { id: productId },
     });
 
     if (!product) {

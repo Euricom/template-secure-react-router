@@ -23,7 +23,10 @@ export const action = createProtectedAction({
     inviteId: z.string(),
   }),
   function: async ({ request, params }) => {
-    const inviteId = params.inviteId;
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+    const { inviteId } = params.data;
 
     if (!inviteId) {
       return { success: false, message: "Invitation ID is required" };
@@ -49,7 +52,11 @@ export const loader = createProtectedLoader({
     inviteId: z.string(),
   }),
   function: async ({ params }) => {
-    const inviteId = params.inviteId;
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+
+    const { inviteId } = params.data;
 
     if (!inviteId) {
       return redirect("/app/organization/members");

@@ -14,9 +14,14 @@ export const action = createProtectedAction({
     id: z.string(),
   }),
   function: async ({ params }) => {
+    if (params.error) {
+      return { success: false, message: params.error.message };
+    }
+    const { id } = params.data;
+
     try {
       await prisma.user.delete({
-        where: { id: params.id },
+        where: { id },
       });
 
       return { success: true, message: "User deleted successfully" };

@@ -9,14 +9,7 @@ import { formatDate } from "~/lib/date";
 import { Badge } from "~/components/ui/badge";
 import { useState, useEffect } from "react";
 import { auth } from "~/lib/auth";
-import {
-  redirect,
-  useLoaderData,
-  type LoaderFunctionArgs,
-  type ActionFunctionArgs,
-  Form,
-  useActionData,
-} from "react-router";
+import { redirect, useLoaderData, Form, useActionData } from "react-router";
 import { authClient } from "~/lib/auth-client";
 import prisma from "~/lib/prismaClient";
 import {
@@ -31,6 +24,7 @@ import {
 } from "~/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import z from "zod";
 
 type Session = {
   id: string;
@@ -39,6 +33,7 @@ type Session = {
   isCurrent: boolean;
 };
 
+// TODO: split intent into separate actions
 export const action = createProtectedAction({
   function: async ({ request }) => {
     const formData = await request.formData();

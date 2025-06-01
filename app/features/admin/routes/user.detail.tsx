@@ -17,8 +17,13 @@ export const loader = createProtectedLoader({
     id: z.string(),
   }),
   function: async ({ params }) => {
+    if (params.error) {
+      throw new Response(params.error.message, { status: 400 });
+    }
+    const { id } = params.data;
+
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         sessions: {
           orderBy: { createdAt: "desc" },
