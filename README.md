@@ -232,3 +232,7 @@ import { Can } from "~/components/providers/permission.provider";
     - https://react-router-devtools.forge42.dev/
   - [ ] Env variables evaluation
     - https://dane.computer/blogs/type-safe-environment-variables-in-remix
+
+Known bugs
+
+- [ ] When logging in with google, the user is not redirected to the dashboard

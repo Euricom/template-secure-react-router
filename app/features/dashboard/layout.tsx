@@ -55,14 +55,6 @@ const navMain: NavItem[] = [
         title: "Members",
         url: "/app/organization/members",
       },
-      {
-        title: "Access",
-        url: "/app/organization/access",
-      },
-      {
-        title: "Teams",
-        url: "/app/organization/teams",
-      },
     ],
   },
 ];
@@ -76,10 +68,6 @@ const navAdmin: NavItem[] = [
       {
         title: "Users",
         url: "/app/admin/users",
-      },
-      {
-        title: "Roles",
-        url: "#",
       },
     ],
   },
