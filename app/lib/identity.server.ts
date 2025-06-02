@@ -19,7 +19,10 @@ export const getUserInformation = async (request: Request) => {
       AND: [{ userId: session.user.id }, { organizationId: orgId }],
     },
   });
-  if (!member) throw new Response("User is not a member of the organization", { status: 400 });
+  if (!member)
+    throw new Response("User is not a member of the organization", {
+      status: 400,
+    });
 
   return {
     user: session.user,

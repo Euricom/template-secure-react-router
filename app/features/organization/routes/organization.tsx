@@ -95,7 +95,9 @@ export const loader = createProtectedLoader({
 });
 
 export default function OrganizationGeneral() {
-  const { activeOrg } = useLoaderData<{ activeOrg: { id: string; name: string; slug: string } }>();
+  const { activeOrg } = useLoaderData<{
+    activeOrg: { id: string; name: string; slug: string };
+  }>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

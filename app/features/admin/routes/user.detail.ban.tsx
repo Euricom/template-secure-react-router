@@ -37,7 +37,11 @@ export const action = createProtectedAction({
     const { id } = params.data;
 
     if (form.error) {
-      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+      return {
+        success: false,
+        message: form.error.message,
+        fieldErrors: form.fieldErrors,
+      };
     }
     const { banReason, banExpires } = form.data;
 

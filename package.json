@@ -11,7 +11,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
+    "biome:format": "biome format --write",
+    "biome:lint": "biome lint --write",
+    "biome:check": "biome check --write"
   },
   "dependencies": {
     "@casl/ability": "^6.7.3",
@@ -47,6 +49,7 @@
     "zod": "^3.25.48"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@react-router/dev": "^7.6.1",
     "@tailwindcss/vite": "^4.1.8",
     "@types/node": "^22.15.29",

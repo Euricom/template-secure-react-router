@@ -26,6 +26,8 @@
     - https://react-router-devtools.forge42.dev/
   - [ ] Env variables evaluation
     - https://dane.computer/blogs/type-safe-environment-variables-in-remix
+  - [ ] Biome
+    - https://biomejs.dev/
 
 # Some useful resources that can improve this project
 

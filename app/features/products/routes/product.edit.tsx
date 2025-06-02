@@ -27,7 +27,10 @@ export const action = createProtectedAction({
     const { productId } = params.data;
 
     if (form.error) {
-      return { error: "Failed to update product", fieldErrors: form.fieldErrors };
+      return {
+        error: "Failed to update product",
+        fieldErrors: form.fieldErrors,
+      };
     }
     const { name } = form.data;
 

@@ -12,7 +12,10 @@ export const action = createProtectedAction({
           callbackURL: "http://localhost:5173/goodbye", // Some auth providers require password confirmation
         },
       });
-      return { success: true, message: "Account deletion request sent to your email" };
+      return {
+        success: true,
+        message: "Account deletion request sent to your email",
+      };
     } catch (error) {
       return { success: false, error: "Failed to delete account" };
     }

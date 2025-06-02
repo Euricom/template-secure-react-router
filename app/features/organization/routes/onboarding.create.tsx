@@ -28,7 +28,11 @@ export const action = createProtectedAction({
   }),
   function: async ({ request, identity, form }) => {
     if (form.error) {
-      return { success: false, message: form.error.message, fieldErrors: form.fieldErrors };
+      return {
+        success: false,
+        message: form.error.message,
+        fieldErrors: form.fieldErrors,
+      };
     }
     const { name } = form.data;
 
