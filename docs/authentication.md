@@ -85,8 +85,7 @@ The authentication system implements several security measures:
 
    - Secure cookies in production
    - HttpOnly flag to prevent JavaScript access
-   - SameSite=strict to prevent CSRF attacks
-   - Partitioned cookies for additional isolation
+   - SameSite=lax to prevent CSRF attacks
 
 2. **Password Security**:
 
@@ -127,8 +126,7 @@ advanced: {
   defaultCookieAttributes: {
     secure: true,
     httpOnly: true,
-    sameSite: "strict",
-    partitioned: true,
+    sameSite: "lax",
     prefix: process.env.NODE_ENV === "development" ? undefined : "host",
   },
 }
@@ -150,8 +148,7 @@ advanced: {
 3. **Cookie Attributes**
    - `secure: true`: Ensures cookies are only sent over HTTPS connections
    - `httpOnly: true`: Prevents JavaScript access to cookies, protecting against XSS attacks
-   - `sameSite: "strict"`: Prevents the cookie from being sent in cross-site requests, protecting against CSRF attacks
-   - `partitioned: true`: Enables cookie partitioning, providing additional isolation between different contexts
+   - `sameSite: "lax"`: Allows cookies to be sent in top-level navigations and GET requests, while blocking them in cross-site POST requests, providing a balance between security and functionality
    - `prefix: "host"`: In production, uses the `__host-` prefix which:
      - Ensures cookies are only sent to the exact host that set them
      - Prevents subdomain attacks

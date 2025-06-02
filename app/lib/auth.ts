@@ -6,8 +6,7 @@
  * 1. Cookie Security:
  *    - Secure cookies are enabled in production
  *    - HttpOnly flag prevents JavaScript access to cookies
- *    - SameSite=strict prevents CSRF attacks
- *    - Partitioned cookies provide additional isolation
+ *    - SameSite=lax prevents CSRF attacks
  *
  * 2. Password Security:
  *    - Email verification is required for new accounts
@@ -82,8 +81,8 @@ export const options = {
     defaultCookieAttributes: {
       secure: true, // SECURITY: Ensures cookies are only sent over HTTPS
       httpOnly: true, // SECURITY: Prevents JavaScript access to cookies
-      sameSite: "strict" as "strict", // SECURITY: Prevents CSRF attacks
-      partitioned: true, // SECURITY: Provides additional cookie isolation
+      sameSite: "lax" as "lax", // SECURITY: Prevents CSRF attacks
+      partitioned: false, // Not enough browser support
       prefix: process.env.NODE_ENV === "development" ? undefined : ("host" as "host"),
     },
   },
