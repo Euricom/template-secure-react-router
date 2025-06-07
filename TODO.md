@@ -22,7 +22,7 @@
 - Usability
   - [ ] Breadcrumbs
 - Dev experience
-  - [ ] Dev tools
+  - [x] Dev tools
     - https://react-router-devtools.forge42.dev/
   - [x] Env variables evaluation
     - https://dane.computer/blogs/type-safe-environment-variables-in-remix
