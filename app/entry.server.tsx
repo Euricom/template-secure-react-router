@@ -9,13 +9,13 @@ import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import type {
-  ActionFunctionArgs,
-  AppLoadContext,
-  EntryContext,
-  LoaderFunctionArgs,
+import {
+  type ActionFunctionArgs,
+  type AppLoadContext,
+  type EntryContext,
+  type LoaderFunctionArgs,
+  ServerRouter,
 } from "react-router";
-import { ServerRouter } from "react-router";
 import { getEnv, init } from "./lib/env.server";
 import { NonceProvider } from "./lib/nonce-provider";
 

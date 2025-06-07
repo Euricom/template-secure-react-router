@@ -4,8 +4,7 @@ import { Form, useActionData, useNavigate, useOutletContext } from "react-router
 import { toast } from "sonner";
 import z from "zod";
 import { Button } from "~/components/ui/button";
-import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
-import { Dialog } from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import prisma from "~/lib/prismaClient";
 import { createProtectedAction } from "~/lib/secureRoute";

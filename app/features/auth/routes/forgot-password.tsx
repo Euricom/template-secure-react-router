@@ -1,7 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Form } from "react-router";
-import { Link } from "react-router";
+import { Form, Link } from "react-router";
 import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";

@@ -1,7 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Form } from "react-router";
-import { useNavigate, useSearchParams } from "react-router";
+import { Form, useNavigate, useSearchParams } from "react-router";
 import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";

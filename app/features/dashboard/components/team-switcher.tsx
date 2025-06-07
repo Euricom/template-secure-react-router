@@ -1,12 +1,6 @@
 import { ChevronsUpDown } from "lucide-react";
-import * as React from "react";
 import { Link } from "react-router";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "~/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "~/components/ui/sidebar";
 
 export function TeamSwitcher({
   activeOrg,

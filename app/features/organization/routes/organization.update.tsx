@@ -1,10 +1,7 @@
 import { redirect } from "react-router";
 import z from "zod";
 import { auth } from "~/lib/auth";
-import {
-  createProtectedAction,
-  createProtectedLoader,
-} from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {

@@ -1,21 +1,12 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { Form, redirect, useLoaderData } from "react-router";
-import { useNavigate } from "react-router";
-import { useActionData } from "react-router";
+import { useEffect, useState } from "react";
+import { Form, redirect, useActionData, useLoaderData, useNavigate } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 import { Button } from "~/components/ui/button";
-import { DialogFooter } from "~/components/ui/dialog";
-import { DialogContent } from "~/components/ui/dialog";
-import { DialogTitle } from "~/components/ui/dialog";
-import { Dialog } from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import {
-  createProtectedAction,
-  createProtectedLoader,
-} from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -113,11 +104,7 @@ export default function MembersInviteCancel() {
         <DialogFooter>
           <Form method="post" className="grid gap-6">
             <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={navigateToParent}
-              >
+              <Button type="button" variant="outline" onClick={navigateToParent}>
                 Cancel
               </Button>
               <Button type="submit" variant="destructive">

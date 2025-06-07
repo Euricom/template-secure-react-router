@@ -1,23 +1,19 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { Form, useLoaderData } from "react-router";
-import { useNavigate } from "react-router";
-import { useActionData } from "react-router";
+import { useEffect, useState } from "react";
+import { Form, useActionData, useLoaderData, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
+  Dialog,
   DialogClose,
+  DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from "~/components/ui/dialog";
-import { DialogContent } from "~/components/ui/dialog";
-import { DialogTitle } from "~/components/ui/dialog";
-import { Dialog } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import { createProtectedLoader } from "~/lib/secureRoute";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -119,9 +115,7 @@ export default function MembersSetRole() {
         </DialogHeader>
         <Form method="post" className="space-y-4">
           {actionData?.fieldErrors && (
-            <div className="text-destructive text-sm">
-              {actionData.fieldErrors.role}
-            </div>
+            <div className="text-destructive text-sm">{actionData.fieldErrors.role}</div>
           )}
           <input type="hidden" name="intent" value="update-role" />
           <input type="hidden" name="memberId" value={member.id} />

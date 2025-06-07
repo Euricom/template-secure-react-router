@@ -1,4 +1,3 @@
-import type { Organization } from "@prisma/client";
 import { type LucideIcon, Package, Users } from "lucide-react";
 import { Settings2 } from "lucide-react";
 import { useMemo } from "react";

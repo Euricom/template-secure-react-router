@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, useLoaderData, useFetcher } from "react-router";
+import { Form, useFetcher, useLoaderData } from "react-router";
 import { InputWithLabel } from "~/components/input-with-label";
 import {
   AlertDialog,
@@ -57,11 +57,7 @@ export default function OrganizationGeneral() {
           <CardTitle>Organization Details</CardTitle>
           <CardDescription>Manage your organization settings.</CardDescription>
         </CardHeader>
-        <updateFetcher.Form
-          method="post"
-          action="/app/organization/update"
-          autoComplete="off"
-        >
+        <updateFetcher.Form method="post" action="/app/organization/update" autoComplete="off">
           <CardContent className="space-y-4 py-4">
             <InputWithLabel
               label="Name"
@@ -79,9 +75,7 @@ export default function OrganizationGeneral() {
             </Button>
 
             {updateFetcher.data?.error && (
-              <div className="text-destructive text-sm text-center">
-                {updateFetcher.data.error}
-              </div>
+              <div className="text-destructive text-sm text-center">{updateFetcher.data.error}</div>
             )}
             {updateFetcher.data?.success && (
               <div className="text-green-600 text-sm text-center">
@@ -97,8 +91,7 @@ export default function OrganizationGeneral() {
         <CardHeader>
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
           <CardDescription>
-            Remove this organization and all its data. This action cannot be
-            undone.
+            Remove this organization and all its data. This action cannot be undone.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -117,19 +110,15 @@ export default function OrganizationGeneral() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete your organization and all its data.
-              This action cannot be undone.
+              This will permanently delete your organization and all its data. This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Form method="post" action="/app/organization/delete">
             <input type="hidden" name="organizationId" value={activeOrg.id} />
             <input type="hidden" name="intent" value="delete" />
             <AlertDialogFooter>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setShowDeleteDialog(false)}
-              >
+              <Button type="button" variant="secondary" onClick={() => setShowDeleteDialog(false)}>
                 Cancel
               </Button>
               <Button type="submit" variant="destructive">

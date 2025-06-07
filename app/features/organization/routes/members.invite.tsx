@@ -5,14 +5,14 @@ import z from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";
 import {
+  Dialog,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from "~/components/ui/dialog";
-import { DialogContent } from "~/components/ui/dialog";
-import { DialogTitle } from "~/components/ui/dialog";
-import { Dialog } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
 import { createProtectedAction } from "~/lib/secureRoute";
 
@@ -84,22 +84,12 @@ export default function MembersInvite() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>
-          <DialogDescription>
-            Invite a new member to your organization by email.
-          </DialogDescription>
+          <DialogDescription>Invite a new member to your organization by email.</DialogDescription>
         </DialogHeader>
         <Form method="post" className="space-y-4">
-          {actionData?.error && (
-            <div className="text-destructive text-sm">{actionData.error}</div>
-          )}
+          {actionData?.error && <div className="text-destructive text-sm">{actionData.error}</div>}
           <input type="hidden" name="intent" value="invite" />
-          <InputWithLabel
-            label="Email"
-            id="invite-email"
-            name="email"
-            type="email"
-            required
-          />
+          <InputWithLabel label="Email" id="invite-email" name="email" type="email" required />
           <div>
             <label htmlFor="role" className="block text-sm font-medium mb-1">
               Role

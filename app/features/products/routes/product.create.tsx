@@ -4,8 +4,7 @@ import { z } from "zod";
 import { Header } from "~/components/header";
 import prisma from "~/lib/prismaClient";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
-import { productSchema } from "../components/product-form";
-import { ProductForm } from "../components/product-form";
+import { ProductForm, productSchema } from "../components/product-form";
 
 export const action = createProtectedAction({
   permissions: {
