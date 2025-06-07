@@ -20,3 +20,5 @@
 ## Development
 
 - [Naming Conventions](./naming-conventions.md) - Project naming standards and conventions
+- [Development Tools](./development-tools.md) - Development environment setup and tools
+- [Environment Configuration](./environment.md) - Environment variables and configuration management
