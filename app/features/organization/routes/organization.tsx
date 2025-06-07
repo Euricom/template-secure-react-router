@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, useLoaderData, useNavigation } from "react-router";
+import { Form, useLoaderData, useFetcher } from "react-router";
 import { InputWithLabel } from "~/components/input-with-label";
 import {
   AlertDialog,
@@ -42,8 +42,12 @@ export default function OrganizationGeneral() {
   const { activeOrg } = useLoaderData<{
     activeOrg: { id: string; name: string; slug: string };
   }>();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const updateFetcher = useFetcher<{
+    success?: boolean;
+    error?: string;
+    errors?: Record<string, string[]>;
+  }>();
+  const isSubmitting = updateFetcher.state === "submitting";
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
@@ -53,32 +57,39 @@ export default function OrganizationGeneral() {
           <CardTitle>Organization Details</CardTitle>
           <CardDescription>Manage your organization settings.</CardDescription>
         </CardHeader>
-        <Form method="post" action="/app/organization/edit" autoComplete="off">
-          {/* TODO: add error feedback from action */}
+        <updateFetcher.Form
+          method="post"
+          action="/app/organization/update"
+          autoComplete="off"
+        >
           <CardContent className="space-y-4 py-4">
             <InputWithLabel
               label="Name"
               id="name"
               name="name"
               defaultValue={activeOrg.name}
-              // error={actionData?.errors?.name?.[0]}
+              error={updateFetcher.data?.errors?.name?.[0]}
               autoFocus
             />
             <input type="hidden" name="organizationId" value={activeOrg.id} />
-            <input type="hidden" name="intent" value="edit" />
           </CardContent>
           <CardFooter className="flex flex-col gap-2 items-stretch">
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
-            {/* TODO: add error feedback from action */}
 
-            {/* {actionData?.error && (
-              <div className="text-destructive text-sm text-center">{actionData.error}</div>
-            )} */}
-            {/* {actionData?.success && <div className="text-success text-sm text-center">Saved!</div>} */}
+            {updateFetcher.data?.error && (
+              <div className="text-destructive text-sm text-center">
+                {updateFetcher.data.error}
+              </div>
+            )}
+            {updateFetcher.data?.success && (
+              <div className="text-green-600 text-sm text-center">
+                Organization updated successfully!
+              </div>
+            )}
           </CardFooter>
-        </Form>
+        </updateFetcher.Form>
       </Card>
 
       {/* Danger Zone */}

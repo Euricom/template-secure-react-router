@@ -13,7 +13,7 @@ export const organizationRoutes = [
     ]),
     route("/onboarding/join/:inviteId", "./routes/onboarding.join.byId.tsx"),
     route("/", "./routes/organization.tsx", [
-      route("edit", "./routes/organization.update.tsx"),
+      route("update", "./routes/organization.update.tsx"),
       route("delete", "./routes/organization.delete.tsx"),
     ]),
     route("/members", "./routes/members.tsx", [

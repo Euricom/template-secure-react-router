@@ -1,7 +1,10 @@
 import { redirect } from "react-router";
 import z from "zod";
 import { auth } from "~/lib/auth";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import {
+  createProtectedAction,
+  createProtectedLoader,
+} from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -14,7 +17,11 @@ export const action = createProtectedAction({
   }),
   function: async ({ request, form }) => {
     if (form.error) {
-      return { success: false, error: "Failed to update organization" };
+      return {
+        success: false,
+        error: "Failed to update organization",
+        errors: form.fieldErrors,
+      };
     }
     const { name, organizationId } = form.data;
 
