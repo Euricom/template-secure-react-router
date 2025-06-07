@@ -1,16 +1,16 @@
-import { useLoaderData, Outlet, useNavigate } from "react-router";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Outlet, useLoaderData, useNavigate } from "react-router";
+import { Link } from "react-router";
+import { z } from "zod";
+import { Header } from "~/components/header";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import { Header } from "~/components/header";
 import { RecentSessions } from "~/features/admin/components/recent-sessions";
-import prisma from "~/lib/prismaClient";
-import { formatDate } from "~/lib/date";
-import { Link } from "react-router";
 import { authClient } from "~/lib/auth-client";
+import { formatDate } from "~/lib/date";
+import prisma from "~/lib/prismaClient";
 import { createProtectedLoader } from "~/lib/secureRoute";
-import { z } from "zod";
 
 export const loader = createProtectedLoader({
   paramValidation: z.object({
@@ -79,8 +79,8 @@ export default function UserDetailPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">Roles:</span>
                       <div className="flex items-center gap-1">
-                        {user.role.map((role, index) => (
-                          <Badge key={index} variant={role === "admin" ? "default" : "secondary"}>
+                        {user.role.map((role) => (
+                          <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
                             {role}
                           </Badge>
                         ))}

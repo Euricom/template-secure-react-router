@@ -1,8 +1,8 @@
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { authClient } from "~/lib/auth-client";
-import { useNavigate } from "react-router";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
 
 type SocialProvider = Parameters<typeof authClient.signIn.social>[0]["provider"];
 
@@ -42,7 +42,7 @@ export function SocialLoginButtons() {
         {loading === "google" ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <svg className="h-4 w-4" viewBox="0 0 24 24">
+          <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -73,7 +73,7 @@ export function SocialLoginButtons() {
         {loading === "microsoft" ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <svg className="h-4 w-4" viewBox="0 0 23 23">
+          <svg className="h-4 w-4" viewBox="0 0 23 23" aria-hidden="true">
             <path fill="#f3f3f3" d="M0 0h23v23H0z" />
             <path fill="#f35325" d="M1 1h10v10H1z" />
             <path fill="#81bc06" d="M12 1h10v10H12z" />

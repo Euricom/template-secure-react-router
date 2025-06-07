@@ -1,5 +1,5 @@
-import * as React from "react";
 import { ChevronsUpDown } from "lucide-react";
+import * as React from "react";
 import { Link } from "react-router";
 import {
   SidebarMenu,

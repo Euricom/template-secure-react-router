@@ -1,6 +1,6 @@
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 export function meta() {
   return [
@@ -40,7 +40,7 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
             <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
               <div className="mt-24 sm:mt-32 lg:mt-16">
-                <a href="#" className="inline-flex space-x-6">
+                <a href="/" className="inline-flex space-x-6" aria-label="What's new">
                   <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold leading-6 text-primary ring-1 ring-inset ring-primary/10">
                     What's new
                   </span>

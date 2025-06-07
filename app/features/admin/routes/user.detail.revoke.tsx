@@ -1,21 +1,21 @@
+import { useEffect, useState } from "react";
 import {
-  useNavigate,
   Form,
   useActionData,
   useLocation,
+  useNavigate,
   useOutletContext,
   useParams,
 } from "react-router";
-import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
-import prisma from "~/lib/prismaClient";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
-import { useEffect, useState } from "react";
 import { auth } from "~/lib/auth";
-import type { OutletContext } from "./user.detail";
+import prisma from "~/lib/prismaClient";
 import { createProtectedAction } from "~/lib/secureRoute";
-import { z } from "zod";
+import type { OutletContext } from "./user.detail";
 
 export const action = createProtectedAction({
   paramValidation: z.object({
@@ -58,6 +58,8 @@ export default function UserRevokeSessionPage() {
   const [open, setOpen] = useState(true);
   const params = useParams();
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);

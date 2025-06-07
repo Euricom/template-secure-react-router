@@ -1,18 +1,18 @@
-import { Form, useLoaderData } from "react-router";
-import { DialogClose, DialogFooter, DialogHeader } from "~/components/ui/dialog";
-import { DialogContent } from "~/components/ui/dialog";
 import { useEffect } from "react";
-import { DialogTitle } from "~/components/ui/dialog";
 import { useState } from "react";
+import { Form, useLoaderData } from "react-router";
 import { useNavigate } from "react-router";
 import { useActionData } from "react-router";
 import { toast } from "sonner";
-import { Dialog } from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
-import prisma from "~/lib/prismaClient";
-import { auth } from "~/lib/auth";
-import { createProtectedLoader } from "~/lib/secureRoute";
 import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { DialogClose, DialogFooter, DialogHeader } from "~/components/ui/dialog";
+import { DialogContent } from "~/components/ui/dialog";
+import { DialogTitle } from "~/components/ui/dialog";
+import { Dialog } from "~/components/ui/dialog";
+import { auth } from "~/lib/auth";
+import prisma from "~/lib/prismaClient";
+import { createProtectedLoader } from "~/lib/secureRoute";
 import { createProtectedAction } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
@@ -95,6 +95,8 @@ export default function MembersSetRole() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
@@ -120,7 +122,9 @@ export default function MembersSetRole() {
           <input type="hidden" name="intent" value="update-role" />
           <input type="hidden" name="memberId" value={member.id} />
           <div>
-            <label className="block text-sm font-medium mb-1">Role</label>
+            <label htmlFor="role" className="block text-sm font-medium mb-1">
+              Role
+            </label>
             <select
               name="role"
               defaultValue={member.currentRole ?? undefined}

@@ -1,15 +1,15 @@
-import { useLoaderData, Link, useSearchParams } from "react-router";
-import { DataTable } from "~/components/data-table";
-import type { ColumnDef } from "@tanstack/react-table";
-import { formatDate } from "~/lib/date";
-import { Badge } from "~/components/ui/badge";
-import { Header } from "~/components/header";
-import prisma from "~/lib/prismaClient";
 import { Prisma } from "@prisma/client";
-import { Can } from "~/components/providers/permission.provider";
-import { Button } from "~/components/ui/button";
-import { createProtectedLoader } from "~/lib/secureRoute";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Link, useLoaderData, useSearchParams } from "react-router";
 import { z } from "zod";
+import { DataTable } from "~/components/data-table";
+import { Header } from "~/components/header";
+import { Can } from "~/components/providers/permission.provider";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { formatDate } from "~/lib/date";
+import prisma from "~/lib/prismaClient";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
 export const loader = createProtectedLoader({
   queryValidation: z.object({
@@ -91,8 +91,8 @@ export default function UsersPage() {
         const roles = row.original.role;
         return roles ? (
           <div className="flex flex-wrap gap-1">
-            {roles.map((role, index) => (
-              <Badge key={index} variant={role === "admin" ? "default" : "secondary"}>
+            {roles.map((role) => (
+              <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
                 {role}
               </Badge>
             ))}

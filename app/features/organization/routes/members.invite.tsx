@@ -1,18 +1,15 @@
-import { Form, redirect } from "react-router";
+import { useEffect, useState } from "react";
+import { Form, redirect, useActionData, useNavigate } from "react-router";
+import { toast } from "sonner";
+import z from "zod";
+import { InputWithLabel } from "~/components/input-with-label";
+import { Button } from "~/components/ui/button";
 import { DialogClose, DialogDescription, DialogFooter, DialogHeader } from "~/components/ui/dialog";
 import { DialogContent } from "~/components/ui/dialog";
-import { useEffect } from "react";
 import { DialogTitle } from "~/components/ui/dialog";
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { useActionData } from "react-router";
-import { toast } from "sonner";
 import { Dialog } from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth";
-import { InputWithLabel } from "~/components/input-with-label";
 import { createProtectedAction } from "~/lib/secureRoute";
-import z from "zod";
 
 export const action = createProtectedAction({
   permissions: {
@@ -65,6 +62,8 @@ export default function MembersInvite() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
@@ -89,7 +88,9 @@ export default function MembersInvite() {
           <input type="hidden" name="intent" value="invite" />
           <InputWithLabel label="Email" id="invite-email" name="email" type="email" required />
           <div>
-            <label className="block text-sm font-medium mb-1">Role</label>
+            <label htmlFor="role" className="block text-sm font-medium mb-1">
+              Role
+            </label>
             <select name="role" className="w-full border rounded p-2">
               <option value="member">Member</option>
               <option value="admin">Admin</option>

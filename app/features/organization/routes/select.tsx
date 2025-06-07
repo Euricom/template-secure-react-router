@@ -1,14 +1,14 @@
+import { Plus } from "lucide-react";
 import {
-  useLoaderData,
-  type LoaderFunctionArgs,
   type ActionFunctionArgs,
   Form,
   Link,
+  type LoaderFunctionArgs,
   redirect,
+  useLoaderData,
 } from "react-router";
-import { auth } from "~/lib/auth";
-import { Plus } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogTitle } from "~/components/ui/alert-dialog";
+import { auth } from "~/lib/auth";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();

@@ -7,7 +7,21 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": []
+    "ignore": [
+      "**/node_modules",
+      "**/dist",
+      "**/build",
+      "**/.next",
+      "**/.git",
+      "**/*.min.js",
+      "**/*.min.css",
+      "**/coverage",
+      "**/public",
+      "**/.env*",
+      "**/*.lock",
+      "**/pnpm-lock.yaml",
+      "**/.react-router"
+    ]
   },
   "formatter": {
     "enabled": true,

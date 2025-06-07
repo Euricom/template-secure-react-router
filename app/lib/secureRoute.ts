@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { ensureCanWithIdentity } from "./permissions.server";
-import { getUserInformation } from "./identity.server";
 import type { Subject } from "@casl/ability";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
+import { getUserInformation } from "./identity.server";
+import { ensureCanWithIdentity } from "./permissions.server";
 
 // Types for permission checking
 type PermissionCheck = {
@@ -36,6 +36,7 @@ type BaseProtectedConfig<
 
 // Loader specific configuration
 type ProtectedLoaderConfig<
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   T = any,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
@@ -51,6 +52,7 @@ type ProtectedLoaderConfig<
 
 // Action specific configuration with form validation
 type ProtectedActionConfig<
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   T = any,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
@@ -134,7 +136,12 @@ async function validateIdentity(
   return identity;
 }
 
-function validateParams(params: any, schema?: z.ZodSchema): ValidationResult<any> {
+function validateParams(
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  params: any,
+  schema?: z.ZodSchema
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+): ValidationResult<any> {
   if (!schema) {
     return { data: null };
   }
@@ -150,6 +157,7 @@ function validateParams(params: any, schema?: z.ZodSchema): ValidationResult<any
 function validateQueryParams(
   searchParams: URLSearchParams,
   schema?: z.ZodSchema
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 ): ValidationResult<any> {
   if (!schema) {
     return { data: null };
@@ -172,6 +180,7 @@ function validateQueryParams(
 async function validateFormData(
   request: Request,
   schema?: z.ZodSchema
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 ): Promise<ValidationResultWithFieldErrors<any>> {
   if (!schema) {
     return { data: null };
@@ -218,14 +227,14 @@ async function validateFormData(
       }
       return {
         error: new Error(
-          "Failed to parse form data: " + (error instanceof Error ? error.message : String(error))
+          `Failed to parse form data: ${error instanceof Error ? error.message : String(error)}`
         ),
         fieldErrors: safeFieldErrors,
       };
     }
     return {
       error: new Error(
-        "Failed to parse form data: " + (error instanceof Error ? error.message : String(error))
+        `Failed to parse form data: ${error instanceof Error ? error.message : String(error)}`
       ),
       fieldErrors: {},
     };

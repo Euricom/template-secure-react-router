@@ -1,4 +1,4 @@
-import { AbilityBuilder, createMongoAbility, type Subject } from "@casl/ability";
+import { AbilityBuilder, type Subject, createMongoAbility } from "@casl/ability";
 import type { getUserInformation } from "./identity.server";
 
 type UserType =

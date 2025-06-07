@@ -1,13 +1,13 @@
-import { useNavigate, Form, useActionData, useOutletContext } from "react-router";
-import { Button } from "~/components/ui/button";
+import { useEffect, useState } from "react";
+import { Form, useActionData, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
-import prisma from "~/lib/prismaClient";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
-import { useEffect, useState } from "react";
-import type { OutletContext } from "./user.detail";
+import prisma from "~/lib/prismaClient";
 import { createProtectedAction } from "~/lib/secureRoute";
-import { z } from "zod";
+import type { OutletContext } from "./user.detail";
 
 export const action = createProtectedAction({
   paramValidation: z.object({

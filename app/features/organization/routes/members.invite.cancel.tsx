@@ -1,18 +1,18 @@
-import { Form, redirect, useLoaderData } from "react-router";
-import { DialogFooter } from "~/components/ui/dialog";
-import { DialogContent } from "~/components/ui/dialog";
 import { useEffect } from "react";
-import { DialogTitle } from "~/components/ui/dialog";
 import { useState } from "react";
+import { Form, redirect, useLoaderData } from "react-router";
 import { useNavigate } from "react-router";
 import { useActionData } from "react-router";
 import { toast } from "sonner";
-import { Dialog } from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
-import prisma from "~/lib/prismaClient";
-import { auth } from "~/lib/auth";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 import z from "zod";
+import { Button } from "~/components/ui/button";
+import { DialogFooter } from "~/components/ui/dialog";
+import { DialogContent } from "~/components/ui/dialog";
+import { DialogTitle } from "~/components/ui/dialog";
+import { Dialog } from "~/components/ui/dialog";
+import { auth } from "~/lib/auth";
+import prisma from "~/lib/prismaClient";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -86,6 +86,8 @@ export default function MembersInviteCancel() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);

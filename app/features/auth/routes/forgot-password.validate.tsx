@@ -1,11 +1,11 @@
-import { Form } from "react-router";
-import { useState } from "react";
-import { authClient } from "~/lib/auth-client";
-import { useNavigate, useSearchParams } from "react-router";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Form } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";
-import { z } from "zod";
+import { authClient } from "~/lib/auth-client";
 
 const resetPasswordSchema = z
   .object({
@@ -41,11 +41,11 @@ export default function ResetPassword() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: Partial<Record<keyof ResetPasswordFormData, string>> = {};
-        error.errors.forEach((err) => {
+        for (const err of error.errors) {
           if (err.path[0]) {
             errors[err.path[0] as keyof ResetPasswordFormData] = err.message;
           }
-        });
+        }
         setFormErrors(errors);
       }
       return false;

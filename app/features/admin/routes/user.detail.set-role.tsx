@@ -1,15 +1,15 @@
-import { useNavigate, Form, useActionData, useLocation, useOutletContext } from "react-router";
-import { Button } from "~/components/ui/button";
+import { useEffect, useState } from "react";
+import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import { auth } from "~/lib/auth";
-import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
-import { useState, useEffect } from "react";
-import type { OutletContext } from "./user.detail";
-import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import { auth } from "~/lib/auth";
 import { createProtectedAction } from "~/lib/secureRoute";
+import type { OutletContext } from "./user.detail";
 
 export const action = createProtectedAction({
   paramValidation: z.object({
@@ -53,6 +53,8 @@ export default function UserSetRolePage() {
   const [open, setOpen] = useState(true);
   const [roles, setRoles] = useState<string[]>(user.role || ["user"]);
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);

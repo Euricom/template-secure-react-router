@@ -23,10 +23,10 @@
  *    - Environment variables for sensitive credentials
  */
 
-import { betterAuth, type BetterAuthOptions } from "better-auth";
-import { admin, customSession, organization } from "better-auth/plugins";
-import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin, customSession, organization } from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 
@@ -81,9 +81,9 @@ export const options = {
     defaultCookieAttributes: {
       secure: true, // SECURITY: Ensures cookies are only sent over HTTPS
       httpOnly: true, // SECURITY: Prevents JavaScript access to cookies
-      sameSite: "lax" as "lax", // SECURITY: Prevents CSRF attacks
+      sameSite: "lax" as const, // SECURITY: Prevents CSRF attacks
       partitioned: false, // Not enough browser support
-      prefix: process.env.NODE_ENV === "development" ? undefined : ("host" as "host"),
+      prefix: process.env.NODE_ENV === "development" ? undefined : ("host" as const),
     },
   },
   plugins: [

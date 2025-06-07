@@ -1,4 +1,4 @@
-import { Outlet, redirect, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs, Outlet, redirect } from "react-router";
 import { auth } from "~/lib/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {

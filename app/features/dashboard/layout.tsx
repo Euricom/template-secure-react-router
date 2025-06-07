@@ -1,5 +1,8 @@
-import { Outlet, redirect, useOutletContext, type LoaderFunctionArgs } from "react-router";
-import { AppSidebar } from "./components/app-sidebar";
+import type { Organization } from "@prisma/client";
+import { type LucideIcon, Package, Users } from "lucide-react";
+import { Settings2 } from "lucide-react";
+import { useMemo } from "react";
+import { type LoaderFunctionArgs, Outlet, redirect, useOutletContext } from "react-router";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,14 +13,11 @@ import {
 } from "~/components/ui/breadcrumb";
 import { Separator } from "~/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
-import { auth } from "~/lib/auth";
 import { Toaster } from "~/components/ui/sonner";
-import type { Route } from "./+types/layout";
-import { Package, Users, type LucideIcon } from "lucide-react";
-import { Settings2 } from "lucide-react";
-import { useMemo } from "react";
-import type { Organization } from "@prisma/client";
+import { auth } from "~/lib/auth";
 import type { ActiveOrg } from "../organization/orgCheck.layout";
+import type { Route } from "./+types/layout";
+import { AppSidebar } from "./components/app-sidebar";
 
 type NavItem = {
   title: string;

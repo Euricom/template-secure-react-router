@@ -13,7 +13,7 @@
  *    - Organization selection flow
  */
 
-import { Outlet, redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs, Outlet, redirect, useLoaderData } from "react-router";
 import { auth } from "~/lib/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {

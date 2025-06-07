@@ -1,12 +1,12 @@
-import { Form } from "react-router";
-import { useState } from "react";
-import { authClient } from "~/lib/auth-client";
-import { useNavigate, Link } from "react-router";
 import { Loader2 } from "lucide-react";
-import { InputWithLabel } from "~/components/input-with-label";
-import { Button } from "~/components/ui/button";
+import { useState } from "react";
+import { Form } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { z } from "zod";
+import { InputWithLabel } from "~/components/input-with-label";
 import { SocialLoginButtons } from "~/components/social-login-buttons";
+import { Button } from "~/components/ui/button";
+import { authClient } from "~/lib/auth-client";
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -33,11 +33,11 @@ export default function SignUp() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: Partial<Record<keyof SignupFormData, string>> = {};
-        error.errors.forEach((err) => {
+        for (const err of error.errors) {
           if (err.path[0]) {
             errors[err.path[0] as keyof SignupFormData] = err.message;
           }
-        });
+        }
         setFormErrors(errors);
       }
       return false;

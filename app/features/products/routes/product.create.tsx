@@ -1,11 +1,11 @@
 import { redirect } from "react-router";
 import { useActionData, useNavigation } from "react-router";
-import prisma from "~/lib/prismaClient";
 import { z } from "zod";
+import { Header } from "~/components/header";
+import prisma from "~/lib/prismaClient";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 import { productSchema } from "../components/product-form";
 import { ProductForm } from "../components/product-form";
-import { Header } from "~/components/header";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {

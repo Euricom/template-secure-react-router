@@ -1,13 +1,13 @@
+import { subject } from "@casl/ability";
 import { redirect } from "react-router";
 import { useActionData, useLoaderData, useNavigation } from "react-router";
-import prisma from "~/lib/prismaClient";
 import { z } from "zod";
-import { productSchema } from "../components/product-form";
-import { ProductForm } from "../components/product-form";
 import { Header } from "~/components/header";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
-import { subject } from "@casl/ability";
+import prisma from "~/lib/prismaClient";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { productSchema } from "../components/product-form";
+import { ProductForm } from "../components/product-form";
 
 export const action = createProtectedAction({
   permissions: {

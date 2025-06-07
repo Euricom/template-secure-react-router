@@ -1,15 +1,15 @@
-import { useNavigate, Form, useActionData, useLocation, useOutletContext } from "react-router";
-import { Button } from "~/components/ui/button";
+import { useEffect, useState } from "react";
+import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import { auth } from "~/lib/auth";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button";
 import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
-import { useState, useEffect } from "react";
-import type { OutletContext } from "./user.detail";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { auth } from "~/lib/auth";
 import { createProtectedAction } from "~/lib/secureRoute";
+import type { OutletContext } from "./user.detail";
 
 export const action = createProtectedAction({
   paramValidation: z.object({
@@ -70,6 +70,8 @@ export default function UserBanPage() {
   const location = useLocation();
   const [open, setOpen] = useState(true);
 
+  // TODO: Fix this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);

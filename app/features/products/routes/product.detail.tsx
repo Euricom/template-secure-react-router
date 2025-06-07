@@ -1,12 +1,12 @@
-import { useLoaderData, Link, Outlet } from "react-router";
-import prisma from "~/lib/prismaClient";
-import { Header } from "~/components/header";
-import { formatDate } from "~/lib/date";
-import { Button } from "~/components/ui/button";
-import { Can } from "~/components/providers/permission.provider";
 import { subject } from "@casl/ability";
-import { createProtectedLoader } from "~/lib/secureRoute";
+import { Link, Outlet, useLoaderData } from "react-router";
 import z from "zod";
+import { Header } from "~/components/header";
+import { Can } from "~/components/providers/permission.provider";
+import { Button } from "~/components/ui/button";
+import { formatDate } from "~/lib/date";
+import prisma from "~/lib/prismaClient";
+import { createProtectedLoader } from "~/lib/secureRoute";
 
 export const loader = createProtectedLoader({
   permissions: {

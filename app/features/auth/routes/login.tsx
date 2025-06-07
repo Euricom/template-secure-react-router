@@ -1,14 +1,14 @@
-import { Form } from "react-router";
-import { useState } from "react";
-import { authClient } from "~/lib/auth-client";
-import { useNavigate, Link } from "react-router";
 import { Loader2 } from "lucide-react";
-import { InputWithLabel } from "~/components/input-with-label";
-import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
-import { Checkbox } from "~/components/ui/checkbox";
+import { useState } from "react";
+import { Form } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { z } from "zod";
+import { InputWithLabel } from "~/components/input-with-label";
 import { SocialLoginButtons } from "~/components/social-login-buttons";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import { authClient } from "~/lib/auth-client";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -34,11 +34,11 @@ export default function SignIn() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: Partial<Record<keyof LoginFormData, string>> = {};
-        error.errors.forEach((err) => {
+        for (const err of error.errors) {
           if (err.path[0]) {
             errors[err.path[0] as keyof LoginFormData] = err.message;
           }
-        });
+        }
         setFormErrors(errors);
       }
       return false;

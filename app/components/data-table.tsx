@@ -1,25 +1,25 @@
 "use client";
 
-import * as React from "react";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import type { ColumnDef, VisibilityState } from "@tanstack/react-table";
+import * as React from "react";
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Settings2,
+} from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -28,13 +28,13 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Settings2,
-  ArrowUpDown,
-} from "lucide-react";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -146,6 +146,11 @@ export function DataTable<TData, TValue>({
                         <div
                           className="flex items-center space-x-2 cursor-pointer"
                           onClick={() => handleSort(header.id)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              handleSort(header.id);
+                            }
+                          }}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {sortField === header.id && (
@@ -187,7 +192,7 @@ export function DataTable<TData, TValue>({
           <p className="text-sm font-medium">Rows per page</p>
           <Select
             value={limit.toString()}
-            onValueChange={(value) => onLimitChange?.(parseInt(value))}
+            onValueChange={(value) => onLimitChange?.(Number.parseInt(value))}
           >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={limit} />

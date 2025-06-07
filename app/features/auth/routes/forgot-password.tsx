@@ -1,11 +1,11 @@
-import { Form } from "react-router";
-import { useState } from "react";
-import { authClient } from "~/lib/auth-client";
-import { Link } from "react-router";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Form } from "react-router";
+import { Link } from "react-router";
+import { z } from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";
-import { z } from "zod";
+import { authClient } from "~/lib/auth-client";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -30,11 +30,11 @@ export default function ForgotPassword() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors: Partial<Record<keyof ForgotPasswordFormData, string>> = {};
-        error.errors.forEach((err) => {
+        for (const err of error.errors) {
           if (err.path[0]) {
             errors[err.path[0] as keyof ForgotPasswordFormData] = err.message;
           }
-        });
+        }
         setFormErrors(errors);
       }
       return false;

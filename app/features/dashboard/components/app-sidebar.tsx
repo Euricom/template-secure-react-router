@@ -1,11 +1,9 @@
-import * as React from "react";
 import { AudioWaveform, Command, GalleryVerticalEnd, type LucideIcon } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import type * as React from "react";
 import { useNavigate } from "react-router";
+import { Button } from "~/components/ui/button";
 
-import { NavMain } from "./nav-main";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
+import { useLocation } from "react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +11,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "~/components/ui/sidebar";
-import { useLocation } from "react-router";
 import { authClient } from "~/lib/auth-client";
+import { NavMain } from "./nav-main";
+import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: {

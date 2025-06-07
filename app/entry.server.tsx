@@ -4,20 +4,20 @@
  * For more information, see https://remix.run/file-conventions/entry.server
  */
 
+import crypto from "node:crypto";
 import { PassThrough } from "node:stream";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { isbot } from "isbot";
+import { renderToPipeableStream } from "react-dom/server";
 import type {
   ActionFunctionArgs,
   AppLoadContext,
   EntryContext,
   LoaderFunctionArgs,
 } from "react-router";
-import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
-import { isbot } from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
-import { NonceProvider } from "./lib/nonce-provider";
-import crypto from "node:crypto";
 import { getEnv, init } from "./lib/env.server";
+import { NonceProvider } from "./lib/nonce-provider";
 
 const ABORT_DELAY = 5_000;
 
@@ -96,7 +96,7 @@ export default function handleRequest(
           reject(error);
         },
         onError(error: unknown) {
-          responseStatusCode = 500;
+          // responseStatusCode = 500;
           // Log streaming rendering errors from inside the shell.  Don't log
           // errors encountered during initial shell rendering since they'll
           // reject and get logged in handleDocumentRequest.

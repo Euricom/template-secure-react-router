@@ -1,23 +1,23 @@
 import {
-  isRouteErrorResponse,
   Links,
+  type LoaderFunctionArgs,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useLoaderData,
-  type LoaderFunctionArgs,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { PureAbility, buildMongoQueryMatcher } from "@casl/ability";
+import { packRules, unpackRules } from "@casl/ability/extra";
 import PermissionProvider from "./components/providers/permission.provider";
 import { auth } from "./lib/auth";
-import { ability } from "./lib/permissions.server";
-import { packRules, unpackRules } from "@casl/ability/extra";
-import { buildMongoQueryMatcher, PureAbility } from "@casl/ability";
 import { getEnv } from "./lib/env.server";
 import { useNonce } from "./lib/nonce-provider";
+import { ability } from "./lib/permissions.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -54,6 +54,7 @@ export default function App() {
         <Scripts nonce={nonce} />
         <script
           nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: We need this to allow env variables to be set in the client
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(ENV)}`,
           }}

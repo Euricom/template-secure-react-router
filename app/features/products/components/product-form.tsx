@@ -1,8 +1,8 @@
 import { Form } from "react-router";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { z } from "zod";
 
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),

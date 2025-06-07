@@ -1,11 +1,11 @@
-import { useLoaderData, Outlet, Link } from "react-router";
-import { DataTable } from "~/components/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDate } from "~/lib/date";
-import { Badge } from "~/components/ui/badge";
+import { Link, Outlet, useLoaderData } from "react-router";
+import { DataTable } from "~/components/data-table";
 import { Header } from "~/components/header";
-import prisma from "~/lib/prismaClient";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { formatDate } from "~/lib/date";
+import prisma from "~/lib/prismaClient";
 import { createProtectedLoader } from "~/lib/secureRoute";
 
 export const loader = createProtectedLoader({
@@ -113,17 +113,16 @@ export default function MembersPage() {
               </Link>
             </div>
           );
-        } else {
-          return (
-            <div className="flex gap-2">
-              <Link to={`/app/organization/members/invite/${row.original.id}/cancel`}>
-                <Button variant="outline" size="sm">
-                  Cancel
-                </Button>
-              </Link>
-            </div>
-          );
         }
+        return (
+          <div className="flex gap-2">
+            <Link to={`/app/organization/members/invite/${row.original.id}/cancel`}>
+              <Button variant="outline" size="sm">
+                Cancel
+              </Button>
+            </Link>
+          </div>
+        );
       },
     },
   ];

@@ -1,6 +1,6 @@
-import { expect, describe, test } from "vitest";
-import { ensureCanWithIdentity } from "./permissions.server";
 import { subject } from "@casl/ability";
+import { describe, expect, test } from "vitest";
+import { ensureCanWithIdentity } from "./permissions.server";
 
 const READ = "read";
 const EDIT = "edit";
@@ -17,6 +17,7 @@ const user = {
       id: "organization-1",
       role: "member",
     },
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } as any,
   admin: {
     user: {
@@ -27,6 +28,7 @@ const user = {
       id: "organization-1",
       role: "admin",
     },
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   } as any,
 };
 
