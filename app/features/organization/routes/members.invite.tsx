@@ -4,7 +4,12 @@ import { toast } from "sonner";
 import z from "zod";
 import { InputWithLabel } from "~/components/input-with-label";
 import { Button } from "~/components/ui/button";
-import { DialogClose, DialogDescription, DialogFooter, DialogHeader } from "~/components/ui/dialog";
+import {
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+} from "~/components/ui/dialog";
 import { DialogContent } from "~/components/ui/dialog";
 import { DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
@@ -62,14 +67,12 @@ export default function MembersInvite() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -81,12 +84,22 @@ export default function MembersInvite() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>
-          <DialogDescription>Invite a new member to your organization by email.</DialogDescription>
+          <DialogDescription>
+            Invite a new member to your organization by email.
+          </DialogDescription>
         </DialogHeader>
         <Form method="post" className="space-y-4">
-          {actionData?.error && <div className="text-destructive text-sm">{actionData.error}</div>}
+          {actionData?.error && (
+            <div className="text-destructive text-sm">{actionData.error}</div>
+          )}
           <input type="hidden" name="intent" value="invite" />
-          <InputWithLabel label="Email" id="invite-email" name="email" type="email" required />
+          <InputWithLabel
+            label="Email"
+            id="invite-email"
+            name="email"
+            type="email"
+            required
+          />
           <div>
             <label htmlFor="role" className="block text-sm font-medium mb-1">
               Role

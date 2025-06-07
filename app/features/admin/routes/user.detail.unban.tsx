@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
-import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
 import prisma from "~/lib/prismaClient";
 import { createProtectedAction } from "~/lib/secureRoute";
@@ -40,17 +50,14 @@ export default function UserUnbanPage() {
   const { user } = useOutletContext<OutletContext>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
-  const location = useLocation();
   const [open, setOpen] = useState(true);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate, location.pathname]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -69,7 +76,11 @@ export default function UserUnbanPage() {
         <DialogFooter>
           <Form method="post" className="grid gap-6">
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={navigateToParent}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={navigateToParent}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="default">

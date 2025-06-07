@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { type ActionFunctionArgs, Form, useLoaderData, useNavigation } from "react-router";
-import { z } from "zod";
+import { Form, useLoaderData, useNavigation } from "react-router";
 import { InputWithLabel } from "~/components/input-with-label";
 import {
   AlertDialog,
@@ -22,61 +21,6 @@ import {
 import { auth } from "~/lib/auth";
 
 import { createProtectedLoader } from "~/lib/secureRoute";
-
-// const orgNameSchema = z.object({
-//   name: z.string().min(1, "Name is required"),
-// });
-
-// TODO: Move to secureRoute, split up into multiple actions
-export async function action({ request }: ActionFunctionArgs) {
-  // const identity = await getUserInformation(request);
-
-  // const formData = await request.formData();
-  // const intent = formData.get("intent");
-  // // const name = formData.get("name") as string | undefined;
-  // const organizationId = formData.get("organizationId") as string;
-
-  // if (intent === "edit") {
-  //   ensureCanWithIdentity(identity, "update", "Organization");
-
-  //   try {
-  //     const validated = orgNameSchema.parse({ name });
-
-  //     await auth.api.updateOrganization({
-  //       headers: request.headers,
-  //       body: {
-  //         organizationId,
-  //         data: {
-  //           name: validated.name,
-  //         },
-  //       },
-  //     });
-  //     return { success: true };
-  //   } catch (error) {
-  //     if (error instanceof z.ZodError) {
-  //       return { errors: error.flatten().fieldErrors };
-  //     }
-  //     return { error: "Failed to update organization" };
-  //   }
-  // }
-
-  // if (intent === "delete") {
-  //   ensureCanWithIdentity(identity, "delete", "Organization");
-
-  //   if (typeof auth.api.deleteOrganization !== "function") {
-  //     return { error: "Organization delete API not implemented" };
-  //   }
-  //   await auth.api.deleteOrganization({
-  //     headers: request.headers,
-  //     body: {
-  //       organizationId,
-  //     },
-  //   });
-  //   return redirect("/app/organization/select");
-  // }
-
-  return null;
-}
 
 export const loader = createProtectedLoader({
   permissions: {
@@ -142,7 +86,8 @@ export default function OrganizationGeneral() {
         <CardHeader>
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
           <CardDescription>
-            Remove this organization and all its data. This action cannot be undone.
+            Remove this organization and all its data. This action cannot be
+            undone.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -161,15 +106,19 @@ export default function OrganizationGeneral() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete your organization and all its data. This action cannot be
-              undone.
+              This will permanently delete your organization and all its data.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Form method="post" action="/app/organization/delete">
             <input type="hidden" name="organizationId" value={activeOrg.id} />
             <input type="hidden" name="intent" value="delete" />
             <AlertDialogFooter>
-              <Button type="button" variant="secondary" onClick={() => setShowDeleteDialog(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowDeleteDialog(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="destructive">

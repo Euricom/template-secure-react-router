@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
-import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -16,7 +26,10 @@ export const action = createProtectedAction({
     id: z.string(),
   }),
   formValidation: z.object({
-    banReason: z.string().min(1, "Ban reason is required").max(500, "Ban reason is too long"),
+    banReason: z
+      .string()
+      .min(1, "Ban reason is required")
+      .max(500, "Ban reason is too long"),
     banExpires: z
       .string()
       .optional()
@@ -70,14 +83,12 @@ export default function UserBanPage() {
   const location = useLocation();
   const [open, setOpen] = useState(true);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate, location.pathname]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -97,9 +108,16 @@ export default function UserBanPage() {
         <Form method="post" className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="banReason">Ban Reason</Label>
-            <Input id="banReason" name="banReason" placeholder="Enter ban reason" required />
+            <Input
+              id="banReason"
+              name="banReason"
+              placeholder="Enter ban reason"
+              required
+            />
             {actionData?.fieldErrors?.banReason && (
-              <p className="text-sm text-destructive">{actionData.fieldErrors.banReason[0]}</p>
+              <p className="text-sm text-destructive">
+                {actionData.fieldErrors.banReason[0]}
+              </p>
             )}
           </div>
 
@@ -112,13 +130,19 @@ export default function UserBanPage() {
               min={new Date().toISOString().slice(0, 16)}
             />
             {actionData?.fieldErrors?.banExpires && (
-              <p className="text-sm text-destructive">{actionData.fieldErrors.banExpires[0]}</p>
+              <p className="text-sm text-destructive">
+                {actionData.fieldErrors.banExpires[0]}
+              </p>
             )}
           </div>
 
           <DialogFooter>
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={navigateToParent}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={navigateToParent}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="destructive">

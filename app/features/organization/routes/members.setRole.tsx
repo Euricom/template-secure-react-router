@@ -6,7 +6,11 @@ import { useActionData } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import { DialogClose, DialogFooter, DialogHeader } from "~/components/ui/dialog";
+import {
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+} from "~/components/ui/dialog";
 import { DialogContent } from "~/components/ui/dialog";
 import { DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
@@ -95,14 +99,12 @@ export default function MembersSetRole() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -117,7 +119,9 @@ export default function MembersSetRole() {
         </DialogHeader>
         <Form method="post" className="space-y-4">
           {actionData?.fieldErrors && (
-            <div className="text-destructive text-sm">{actionData.fieldErrors.role}</div>
+            <div className="text-destructive text-sm">
+              {actionData.fieldErrors.role}
+            </div>
           )}
           <input type="hidden" name="intent" value="update-role" />
           <input type="hidden" name="memberId" value={member.id} />

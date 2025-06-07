@@ -12,7 +12,10 @@ import { DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import {
+  createProtectedAction,
+  createProtectedLoader,
+} from "~/lib/secureRoute";
 
 export const action = createProtectedAction({
   permissions: {
@@ -86,14 +89,12 @@ export default function MembersInviteCancel() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -112,7 +113,11 @@ export default function MembersInviteCancel() {
         <DialogFooter>
           <Form method="post" className="grid gap-6">
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={navigateToParent}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={navigateToParent}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="destructive">

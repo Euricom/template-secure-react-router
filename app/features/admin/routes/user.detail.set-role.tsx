@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useOutletContext,
+} from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
 import { Label } from "~/components/ui/label";
 import { auth } from "~/lib/auth";
@@ -16,7 +25,9 @@ export const action = createProtectedAction({
     id: z.string(),
   }),
   formValidation: z.object({
-    roles: z.array(z.enum(["user", "admin"])).min(1, "At least one role is required"),
+    roles: z
+      .array(z.enum(["user", "admin"]))
+      .min(1, "At least one role is required"),
   }),
   function: async ({ request, params, form }) => {
     if (params.error) {
@@ -49,18 +60,15 @@ export default function UserSetRolePage() {
   const { user } = useOutletContext<OutletContext>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
-  const location = useLocation();
   const [open, setOpen] = useState(true);
   const [roles, setRoles] = useState<string[]>(user.role || ["user"]);
 
-  // TODO: Fix this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (actionData?.success) {
       toast.success(actionData.message);
       navigateToParent();
     }
-  }, [actionData, navigate, location.pathname]);
+  }, [actionData]);
 
   function navigateToParent() {
     setOpen(false);
@@ -128,7 +136,11 @@ export default function UserSetRolePage() {
               <input key={role} type="hidden" name="roles" value={role} />
             ))}
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={navigateToParent}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={navigateToParent}
+              >
                 Cancel
               </Button>
               <Button type="submit" variant="default">
