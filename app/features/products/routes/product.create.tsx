@@ -3,7 +3,7 @@ import { useActionData, useNavigation } from "react-router";
 import { z } from "zod";
 import { Header } from "~/components/header";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 import { ProductForm, productSchema } from "../components/product-form";
 
 export const action = createProtectedAction({

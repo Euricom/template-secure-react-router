@@ -8,10 +8,11 @@ import { Dialog } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { auth } from "~/lib/auth";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction } from "~/lib/secureRoute/";
 import type { OutletContext } from "./user.detail";
 
 export const action = createProtectedAction({
+  permissions: "loggedIn",
   paramValidation: z.object({
     id: z.string(),
   }),

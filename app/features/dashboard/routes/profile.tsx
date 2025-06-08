@@ -32,6 +32,7 @@ type Session = {
 };
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   function: async ({ request, identity }) => {
     const sessions = await auth.api.listSessions({
       headers: request.headers,

@@ -3,7 +3,7 @@ import z from "zod";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
   permissions: {

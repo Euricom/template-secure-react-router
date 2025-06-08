@@ -4,7 +4,7 @@ import { Can } from "~/components/providers/permission.provider";
 import { Button } from "~/components/ui/button";
 import { formatDate } from "~/lib/date";
 import prisma from "~/lib/prismaClient";
-import { createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedLoader } from "~/lib/secureRoute/";
 
 export const loader = createProtectedLoader({
   permissions: {

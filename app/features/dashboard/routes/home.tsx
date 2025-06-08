@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { authClient } from "~/lib/auth-client";
 import { formatDate } from "~/lib/date";
 import prisma from "~/lib/prismaClient";
-import { createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedLoader } from "~/lib/secureRoute/";
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   function: async () => {
     const products = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },

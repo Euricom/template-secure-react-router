@@ -1,41 +1,42 @@
 import { Plus } from "lucide-react";
-import {
-  type ActionFunctionArgs,
-  Form,
-  Link,
-  type LoaderFunctionArgs,
-  redirect,
-  useLoaderData,
-} from "react-router";
+import { Form, Link, redirect, useLoaderData } from "react-router";
+import z from "zod";
 import { AlertDialog, AlertDialogContent, AlertDialogTitle } from "~/components/ui/alert-dialog";
 import { auth } from "~/lib/auth";
+import { createPublicAction, createPublicLoader } from "~/lib/secureRoute/";
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const organizationId = formData.get("organizationId") as string;
+export const action = createPublicAction({
+  permissions: "public",
+  formValidation: z.object({
+    organizationId: z.string(),
+  }),
+  function: async ({ request, form }) => {
+    if (form.error) {
+      console.error(form.error);
+      return { error: "Invalid form data" };
+    }
+    const { organizationId } = form.data;
 
-  // TODO: add form validation
-
-  if (organizationId) {
-    // Set active organization
     await auth.api.setActiveOrganization({
       headers: request.headers,
       body: {
         organizationId,
       },
     });
-  }
 
-  return redirect("/app");
-}
+    return redirect("/app");
+  },
+});
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const organizations = await auth.api.listOrganizations({
-    headers: request.headers,
-  });
-
-  return { organizations };
-}
+export const loader = createPublicLoader({
+  permissions: "public",
+  function: async ({ request }) => {
+    const organizations = await auth.api.listOrganizations({
+      headers: request.headers,
+    });
+    return { organizations };
+  },
+});
 
 export default function Select() {
   const { organizations } = useLoaderData<typeof loader>();

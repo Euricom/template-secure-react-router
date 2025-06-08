@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
   permissions: {

@@ -9,9 +9,10 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { formatDate } from "~/lib/date";
 import prisma from "~/lib/prismaClient";
-import { createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedLoader } from "~/lib/secureRoute/";
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   queryValidation: z.object({
     page: z.number().min(1).default(1),
     limit: z.number().min(1).default(10),

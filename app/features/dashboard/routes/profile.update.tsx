@@ -1,9 +1,10 @@
 import { redirect } from "react-router";
 import z from "zod";
 import { auth } from "~/lib/auth";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
+  permissions: "loggedIn",
   formValidation: z.object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
@@ -49,6 +50,7 @@ export const action = createProtectedAction({
 });
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   function: async () => {
     return redirect("/app/profile");
   },

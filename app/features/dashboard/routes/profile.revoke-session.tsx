@@ -2,9 +2,10 @@ import { redirect } from "react-router";
 import { z } from "zod";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
+  permissions: "loggedIn",
   formValidation: z.object({
     sessionId: z.string(),
   }),
@@ -41,6 +42,7 @@ export const action = createProtectedAction({
 });
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   function: async () => {
     return redirect("/app/profile");
   },

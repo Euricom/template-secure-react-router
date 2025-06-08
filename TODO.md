@@ -21,7 +21,6 @@
   - [ ] Sanitization/Serialization
   - [ ] Logging of sensitive data access
   - [ ] ?Data classification
-  - [ ] Secure route: add public version
 
 - Usability
   - [ ] Breadcrumbs

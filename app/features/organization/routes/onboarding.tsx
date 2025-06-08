@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { Link, type LoaderFunctionArgs, Outlet, useLoaderData, useNavigate } from "react-router";
+import { Link, Outlet, useLoaderData, useNavigate } from "react-router";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -10,14 +10,17 @@ import {
 } from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth";
+import { createPublicLoader } from "~/lib/secureRoute/";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const organizations = await auth.api.listOrganizations({
-    headers: request.headers,
-  });
-
-  return { hasOrganizations: organizations.length > 0 };
-}
+export const loader = createPublicLoader({
+  permissions: "public",
+  function: async ({ request }) => {
+    const organizations = await auth.api.listOrganizations({
+      headers: request.headers,
+    });
+    return { hasOrganizations: organizations.length > 0 };
+  },
+});
 
 export default function Onboarding() {
   const { hasOrganizations } = useLoaderData<typeof loader>();

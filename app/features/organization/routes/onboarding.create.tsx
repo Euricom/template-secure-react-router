@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction } from "~/lib/secureRoute/";
 
 const onboardingSchema = z.object({
   name: z.string().min(1, "Name is required"),

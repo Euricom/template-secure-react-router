@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
   permissions: {

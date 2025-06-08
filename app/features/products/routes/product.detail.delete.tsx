@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { ensureCanWithIdentity } from "~/lib/permissions.server";
 import prisma from "~/lib/prismaClient";
-import { createProtectedAction } from "~/lib/secureRoute";
+import { createProtectedAction } from "~/lib/secureRoute/";
 import type { OutletContext } from "./product.detail";
 
 export const action = createProtectedAction({

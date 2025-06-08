@@ -1,8 +1,9 @@
 import { redirect } from "react-router";
 import { auth } from "~/lib/auth";
-import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute";
+import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
+  permissions: "loggedIn",
   function: async ({ request }) => {
     try {
       await auth.api.deleteUser({
@@ -24,6 +25,7 @@ export const action = createProtectedAction({
 });
 
 export const loader = createProtectedLoader({
+  permissions: "loggedIn",
   function: async () => {
     return redirect("/app/profile");
   },
