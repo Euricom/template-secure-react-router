@@ -31,6 +31,7 @@ export const action = createProtectedAction({
 
       return { success: true, message: "User unbanned successfully" };
     } catch (error) {
+      console.error("error", error);
       return { success: false, error: "Failed to unban user" };
     }
   },

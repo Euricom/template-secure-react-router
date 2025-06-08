@@ -38,6 +38,9 @@
 - SEO
   https://github.com/forge-42/seo-tools
 
+- [ ] Global logging
+  - Add in biome.json linter.rules.suspicious.noConsole: "error"
+
 -  Docs for AI
   - How to use a modal
   - Naming of files .edit .delete

@@ -14,7 +14,7 @@ export const action = createProtectedAction({
   formValidation: z.object({
     name: z.string().min(1, "Name is required"),
   }),
-  function: async ({ request, identity, form }) => {
+  function: async ({ identity, form }) => {
     if (form.error) {
       return {
         success: false,

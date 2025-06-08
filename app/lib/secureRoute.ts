@@ -25,7 +25,9 @@ type Identity = Awaited<ReturnType<typeof getUserInformation>>;
 
 // Base configuration type for protected routes
 type BaseProtectedConfig<
-  T,
+  // biome-ignore lint/suspicious/noExplicitAny: This can be anything, it is provided by the dev
+  // biome-ignore lint/correctness/noUnusedVariables: This is used to type the function
+  T = any,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
 > = {

@@ -21,8 +21,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "recommended": true,
-        "noConsole": "error"
+        "recommended": true
       },
       "style": {
         "recommended": true

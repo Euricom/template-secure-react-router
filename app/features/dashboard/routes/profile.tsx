@@ -250,7 +250,8 @@ export default function ProfilePage() {
                           },
                         }
                       );
-                    } catch (err) {
+                    } catch (error) {
+                      console.error("error", error);
                       setError("An unexpected error occurred. Please try again.");
                       setIsResettingPassword(false);
                     }

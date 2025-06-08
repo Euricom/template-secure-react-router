@@ -11,7 +11,6 @@ import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import {
   type ActionFunctionArgs,
-  type AppLoadContext,
   type EntryContext,
   type LoaderFunctionArgs,
   ServerRouter,
@@ -62,8 +61,7 @@ export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  reactRouterContext: EntryContext,
-  loadContext: AppLoadContext
+  reactRouterContext: EntryContext
 ) {
   const callbackName = isbot(request.headers.get("user-agent")) ? "onAllReady" : "onShellReady";
   const nonce = crypto.randomBytes(16).toString("hex");

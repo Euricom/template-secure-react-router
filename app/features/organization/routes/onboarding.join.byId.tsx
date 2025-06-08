@@ -52,6 +52,7 @@ export const action = createProtectedAction({
 
       return redirect("/app");
     } catch (error) {
+      console.error("error", error);
       return { error: "Failed to join organization" };
     }
   },

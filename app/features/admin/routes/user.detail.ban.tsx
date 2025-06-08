@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
+import { Form, useActionData, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -67,7 +67,6 @@ export default function UserBanPage() {
   const { user } = useOutletContext<OutletContext>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
-  const location = useLocation();
   const [open, setOpen] = useState(true);
 
   useEffect(() => {

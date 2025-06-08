@@ -108,7 +108,7 @@ export const auth = betterAuth({
   ...options,
   plugins: [
     ...(options.plugins ?? []),
-    customSession(async ({ user, session }, ctx) => {
+    customSession(async ({ user, session }) => {
       return {
         user,
         session,

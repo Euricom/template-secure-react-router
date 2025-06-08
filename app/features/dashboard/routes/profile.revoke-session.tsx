@@ -34,6 +34,7 @@ export const action = createProtectedAction({
       });
       return { success: true, message: "Session revoked successfully" };
     } catch (error) {
+      console.error("error", error);
       return { success: false, error: "Failed to revoke session" };
     }
   },

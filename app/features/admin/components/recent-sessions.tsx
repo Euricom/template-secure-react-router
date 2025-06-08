@@ -17,7 +17,7 @@ interface RecentSessionsProps {
   userId: string;
 }
 
-export function RecentSessions({ sessions, userId }: RecentSessionsProps) {
+export function RecentSessions({ sessions }: RecentSessionsProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const sessionsPerPage = 10;
   const totalPages = Math.ceil(sessions.length / sessionsPerPage);

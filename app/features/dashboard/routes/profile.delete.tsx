@@ -17,6 +17,7 @@ export const action = createProtectedAction({
         message: "Account deletion request sent to your email",
       };
     } catch (error) {
+      console.error("error", error);
       return { success: false, error: "Failed to delete account" };
     }
   },

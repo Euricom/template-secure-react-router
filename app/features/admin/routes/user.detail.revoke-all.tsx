@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useActionData, useLocation, useNavigate, useOutletContext } from "react-router";
+import { Form, useActionData, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -27,6 +27,7 @@ export const action = createProtectedAction({
 
       return { success: true, message: "All sessions revoked successfully" };
     } catch (error) {
+      console.error("error", error);
       return { success: false, error: "Failed to revoke sessions" };
     }
   },
@@ -36,7 +37,6 @@ export default function UserRevokeAllSessionsPage() {
   const { user } = useOutletContext<OutletContext>();
   const actionData = useActionData<typeof action>();
   const navigate = useNavigate();
-  const location = useLocation();
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
