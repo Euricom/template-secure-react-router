@@ -35,14 +35,14 @@ export default function ProductsPage() {
       {products.length === 0 ? (
         <p className="text-gray-500">No products found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <Link
               key={product.id}
               to={product.id}
-              className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="block rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
             >
-              <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
+              <h2 className="mb-2 font-semibold text-xl">{product.name}</h2>
               <p className="text-gray-500 text-sm">Created: {formatDate(product.createdAt)}</p>
             </Link>
           ))}

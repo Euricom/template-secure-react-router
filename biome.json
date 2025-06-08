@@ -1,27 +1,9 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": {
-    "enabled": false,
+    "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
-  },
-  "files": {
-    "ignoreUnknown": false,
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/build",
-      "**/.next",
-      "**/.git",
-      "**/*.min.js",
-      "**/*.min.css",
-      "**/coverage",
-      "**/public",
-      "**/.env*",
-      "**/*.lock",
-      "**/pnpm-lock.yaml",
-      "**/.react-router"
-    ]
+    "useIgnoreFile": true
   },
   "formatter": {
     "enabled": true,
@@ -38,8 +20,42 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "suspicious": {
+        "recommended": true,
+        "noConsole": "error"
+      },
+      "style": {
+        "recommended": true
+      },
+      "complexity": {
+        "recommended": true
+      },
+      "security": {
+        "recommended": true
+      },
+      "performance": {
+        "recommended": true
+      },
       "correctness": {
-        "noUnusedImports": "error"
+        "recommended": true,
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "noUnusedLabels": "error",
+        "noUnusedFunctionParameters": "error"
+      },
+      "a11y": {
+        "recommended": true
+      },
+      "nursery": {
+        "recommended": true,
+        "noProcessEnv": "error",
+        "useSortedClasses": {
+          "level": "error",
+          "fix": "safe",
+          "options": {
+            "functions": ["cn", "cva", "tw", "clsx", "twMerge"]
+          }
+        }
       }
     }
   },

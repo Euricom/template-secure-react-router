@@ -47,9 +47,9 @@ export default function Select() {
         <div className="grid gap-4">
           <Link
             to="/app/organization/onboarding"
-            className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 cursor-pointer"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-lg border p-4 text-left transition-colors hover:bg-gray-50"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="h-5 w-5" />
             Add Other Organization
           </Link>
 
@@ -58,7 +58,7 @@ export default function Select() {
               <input type="hidden" name="organizationId" value={organization.id} />
               <button
                 type="submit"
-                className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                className="w-full cursor-pointer rounded-lg border p-4 text-left transition-colors hover:bg-gray-50"
               >
                 {organization.name}
               </button>

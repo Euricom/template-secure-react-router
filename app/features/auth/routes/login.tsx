@@ -71,13 +71,13 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
+          <h2 className="mt-6 text-center font-extrabold text-3xl text-foreground">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
+          <p className="mt-2 text-center text-muted-foreground text-sm">
             Or{" "}
             <Link to="/signup" className="font-medium text-primary hover:text-primary/90">
               create a new account
@@ -86,7 +86,7 @@ export default function SignIn() {
         </div>
         <Form onSubmit={signIn} className="mt-8 space-y-6">
           {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
+            <div className="rounded border border-destructive/20 bg-destructive/10 px-4 py-3 text-destructive">
               {error}
             </div>
           )}
@@ -118,7 +118,7 @@ export default function SignIn() {
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
               />
-              <Label htmlFor="remember-me" className="text-sm text-foreground">
+              <Label htmlFor="remember-me" className="text-foreground text-sm">
                 Remember me
               </Label>
             </div>
@@ -141,7 +141,7 @@ export default function SignIn() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
+              <div className="w-full border-border border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">Or continue with</span>

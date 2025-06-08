@@ -120,13 +120,13 @@ export default function MembersSetRole() {
           <input type="hidden" name="intent" value="update-role" />
           <input type="hidden" name="memberId" value={member.id} />
           <div>
-            <label htmlFor="role" className="block text-sm font-medium mb-1">
+            <label htmlFor="role" className="mb-1 block font-medium text-sm">
               Role
             </label>
             <select
               name="role"
               defaultValue={member.currentRole ?? undefined}
-              className="w-full border rounded p-2"
+              className="w-full rounded border p-2"
             >
               <option value="member">Member</option>
               <option value="admin">Admin</option>

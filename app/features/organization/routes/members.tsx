@@ -61,7 +61,7 @@ export default function MembersPage() {
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) =>
-        row.original.name || <span className="italic text-muted-foreground">(invited)</span>,
+        row.original.name || <span className="text-muted-foreground italic">(invited)</span>,
     },
     {
       accessorKey: "email",

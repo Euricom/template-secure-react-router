@@ -35,7 +35,7 @@ export default function Onboarding() {
           </div>
           {hasOrganizations && (
             <Button variant="ghost" className="w-fit" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> Back
             </Button>
           )}
         </AlertDialogHeader>

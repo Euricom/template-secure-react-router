@@ -31,10 +31,10 @@ export function ProductForm({ defaultValues, isSubmitting, errors, error }: Prod
           disabled={isSubmitting}
           defaultValue={defaultValues?.name}
         />
-        {errors?.name && <p className="text-sm text-red-500">{errors.name[0]}</p>}
+        {errors?.name && <p className="text-red-500 text-sm">{errors.name[0]}</p>}
       </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Product"}

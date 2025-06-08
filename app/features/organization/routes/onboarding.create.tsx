@@ -95,12 +95,12 @@ export default function OnboardingCreate() {
             autoFocus
           />
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 items-stretch">
+        <CardFooter className="flex flex-col items-stretch gap-2">
           <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
           {actionData?.error && (
-            <div className="text-destructive text-sm text-center">{actionData.error}</div>
+            <div className="text-center text-destructive text-sm">{actionData.error}</div>
           )}
         </CardFooter>
       </form>

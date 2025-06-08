@@ -97,7 +97,7 @@ export default function MembersInviteCancel() {
       <DialogContent>
         <DialogTitle>Cancel Invitation</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to cancel the invitation for "{invite.email}"?
           </p>
         </div>

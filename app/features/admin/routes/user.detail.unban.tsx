@@ -59,7 +59,7 @@ export default function UserUnbanPage() {
       <DialogContent>
         <DialogTitle>Unban User</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Unban {user.name} ({user.email}) from the platform
           </p>
         </div>

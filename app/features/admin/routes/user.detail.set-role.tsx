@@ -84,7 +84,7 @@ export default function UserSetRolePage() {
       <DialogContent>
         <DialogTitle>Set User Roles</DialogTitle>
         <div className="grid gap-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Set the roles for {user.name} ({user.email})
           </p>
           <div className="grid gap-2">
@@ -98,7 +98,7 @@ export default function UserSetRolePage() {
                 />
                 <label
                   htmlFor="user-role"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   User
                 </label>
@@ -111,7 +111,7 @@ export default function UserSetRolePage() {
                 />
                 <label
                   htmlFor="admin-role"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Admin
                 </label>

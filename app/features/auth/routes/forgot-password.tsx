@@ -69,24 +69,24 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
+          <h2 className="mt-6 text-center font-extrabold text-3xl text-foreground">
             Reset your password
           </h2>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
+          <p className="mt-2 text-center text-muted-foreground text-sm">
             Enter your email address and we'll send you a link to reset your password.
           </p>
         </div>
         <Form onSubmit={requestPasswordReset} className="mt-8 space-y-6">
           {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
+            <div className="rounded border border-destructive/20 bg-destructive/10 px-4 py-3 text-destructive">
               {error}
             </div>
           )}
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+            <div className="rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
               Password reset instructions have been sent to your email address.
             </div>
           )}

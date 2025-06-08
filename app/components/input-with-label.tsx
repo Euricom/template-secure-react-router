@@ -13,7 +13,7 @@ export function InputWithLabel({ label, id, error, ...props }: InputWithLabelPro
     <div className="grid w-full items-center gap-1.5">
       <Label htmlFor={id}>{label}</Label>
       <Input id={id} {...props} />
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

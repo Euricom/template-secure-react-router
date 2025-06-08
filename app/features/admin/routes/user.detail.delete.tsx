@@ -54,7 +54,7 @@ export default function UserDeletePage() {
       <DialogContent>
         <DialogTitle>Delete User</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to delete {user.name} ({user.email})? This action cannot be
             undone.
           </p>

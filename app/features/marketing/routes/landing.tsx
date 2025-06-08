@@ -33,27 +33,27 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       {/* Hero Section */}
       <div className="flex-1">
         <div className="relative isolate overflow-hidden">
-          <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+          <div className="mx-auto max-w-7xl px-6 pt-10 pb-24 sm:pb-32 lg:flex lg:px-8 lg:py-40">
             <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
               <div className="mt-24 sm:mt-32 lg:mt-16">
                 <a href="/" className="inline-flex space-x-6" aria-label="What's new">
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold leading-6 text-primary ring-1 ring-inset ring-primary/10">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm leading-6 ring-1 ring-primary/10 ring-inset">
                     What's new
                   </span>
-                  <span className="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-muted-foreground">
+                  <span className="inline-flex items-center space-x-2 font-medium text-muted-foreground text-sm leading-6">
                     <span>Just shipped v1.0</span>
                     <ArrowRight className="h-5 w-5" aria-hidden="true" />
                   </span>
                 </a>
               </div>
-              <h1 className="mt-10 text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+              <h1 className="mt-10 font-bold text-4xl text-foreground tracking-tight sm:text-6xl">
                 A better way to manage your data
               </h1>
-              <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              <p className="mt-6 text-lg text-muted-foreground leading-8">
                 Experience the future of data management with our secure, scalable, and
                 user-friendly platform.
               </p>
@@ -73,11 +73,11 @@ export default function Home() {
       {/* Features Section */}
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-primary">Everything you need</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="font-semibold text-base text-primary leading-7">Everything you need</h2>
+          <p className="mt-2 font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
             All-in-one platform
           </p>
-          <p className="mt-6 text-lg leading-8 text-muted-foreground">
+          <p className="mt-6 text-lg text-muted-foreground leading-8">
             Our platform provides everything you need to manage your data securely and efficiently.
           </p>
         </div>
@@ -85,11 +85,11 @@ export default function Home() {
           <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
             {features.map((feature) => (
               <div key={feature.title} className="flex flex-col">
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-foreground">
+                <dt className="flex items-center gap-x-3 font-semibold text-base text-foreground leading-7">
                   <CheckCircle2 className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
                   {feature.title}
                 </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-muted-foreground">
+                <dd className="mt-4 flex flex-auto flex-col text-base text-muted-foreground leading-7">
                   <p className="flex-auto">{feature.description}</p>
                 </dd>
               </div>
@@ -99,24 +99,24 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-32 border-t border-border/40">
+      <footer className="mt-32 border-border/40 border-t">
         <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
           <div className="flex justify-center space-x-6 md:order-2">
             <Link
               to="/privacy"
-              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground text-sm leading-6 hover:text-foreground"
             >
               Privacy
             </Link>
             <Link
               to="/terms"
-              className="text-sm leading-6 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground text-sm leading-6 hover:text-foreground"
             >
               Terms
             </Link>
           </div>
           <div className="mt-8 md:order-1 md:mt-0">
-            <p className="text-center text-xs leading-5 text-muted-foreground">
+            <p className="text-center text-muted-foreground text-xs leading-5">
               &copy; {new Date().getFullYear()} Your Company. All rights reserved.
             </p>
           </div>

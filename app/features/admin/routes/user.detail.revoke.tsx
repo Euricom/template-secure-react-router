@@ -73,7 +73,7 @@ export default function UserRevokeSessionPage() {
       <DialogContent>
         <DialogTitle>Revoke Session</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to revoke this session for {user.name} ({user.email})?
           </p>
           <div className="mt-2 space-y-1">

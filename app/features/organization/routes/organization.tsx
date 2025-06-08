@@ -51,7 +51,7 @@ export default function OrganizationGeneral() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
-    <div className="mx-auto w-full max-w-xl flex flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-8">
       <Card>
         <CardHeader>
           <CardTitle>Organization Details</CardTitle>
@@ -69,16 +69,16 @@ export default function OrganizationGeneral() {
             />
             <input type="hidden" name="organizationId" value={activeOrg.id} />
           </CardContent>
-          <CardFooter className="flex flex-col gap-2 items-stretch">
+          <CardFooter className="flex flex-col items-stretch gap-2">
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
 
             {updateFetcher.data?.error && (
-              <div className="text-destructive text-sm text-center">{updateFetcher.data.error}</div>
+              <div className="text-center text-destructive text-sm">{updateFetcher.data.error}</div>
             )}
             {updateFetcher.data?.success && (
-              <div className="text-green-600 text-sm text-center">
+              <div className="text-center text-green-600 text-sm">
                 Organization updated successfully!
               </div>
             )}

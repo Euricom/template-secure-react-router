@@ -195,8 +195,8 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="mb-6">
-              <h3 className="text-lg font-medium">{user.name}</h3>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <h3 className="font-medium text-lg">{user.name}</h3>
+              <p className="text-muted-foreground text-sm">{user.email}</p>
             </div>
 
             <Separator className="my-4" />
@@ -217,7 +217,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="mt-6 flex justify-end gap-2">
-                {error && <div className="text-sm text-destructive">{error}</div>}
+                {error && <div className="text-destructive text-sm">{error}</div>}
                 <Button
                   variant="outline"
                   disabled={isResettingPassword}
@@ -281,7 +281,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <div className="mb-4 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="mb-4 rounded-md bg-destructive/15 p-3 text-destructive text-sm">
                 {error}
               </div>
             )}

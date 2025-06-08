@@ -63,12 +63,12 @@ export default function UserDetailPage() {
             <div className="grid gap-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-medium">{user.name}</h3>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <h3 className="font-medium text-lg">{user.name}</h3>
+                  <p className="text-muted-foreground text-sm">{user.email}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Status:</span>
+                    <span className="text-muted-foreground text-sm">Status:</span>
                     {user.banned ? (
                       <Badge variant="destructive">Banned</Badge>
                     ) : (
@@ -77,7 +77,7 @@ export default function UserDetailPage() {
                   </div>
                   {user.role && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Roles:</span>
+                      <span className="text-muted-foreground text-sm">Roles:</span>
                       <div className="flex items-center gap-1">
                         {user.role.map((role) => (
                           <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
@@ -94,20 +94,20 @@ export default function UserDetailPage() {
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Email Verified</span>
+                  <span className="font-medium text-sm">Email Verified</span>
                   <Badge variant={user.emailVerified ? "default" : "secondary"}>
                     {user.emailVerified ? "Yes" : "No"}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Created At</span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="font-medium text-sm">Created At</span>
+                  <span className="text-muted-foreground text-sm">
                     {formatDate(user.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Last Updated</span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="font-medium text-sm">Last Updated</span>
+                  <span className="text-muted-foreground text-sm">
                     {formatDate(user.updatedAt)}
                   </span>
                 </div>
@@ -118,13 +118,13 @@ export default function UserDetailPage() {
                   <Separator />
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Ban Reason</span>
-                      <span className="text-sm text-muted-foreground">{user.banReason}</span>
+                      <span className="font-medium text-sm">Ban Reason</span>
+                      <span className="text-muted-foreground text-sm">{user.banReason}</span>
                     </div>
                     {user.banExpires && (
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Ban Expires</span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="font-medium text-sm">Ban Expires</span>
+                        <span className="text-muted-foreground text-sm">
                           {formatDate(user.banExpires)}
                         </span>
                       </div>

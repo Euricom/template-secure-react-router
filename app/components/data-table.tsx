@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : (
                         <div
-                          className="flex items-center space-x-2 cursor-pointer"
+                          className="flex cursor-pointer items-center space-x-2"
                           onClick={() => handleSort(header.id)}
                           onKeyDown={(event) => {
                             if (event.key === "Enter") {
@@ -189,7 +189,7 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="font-medium text-sm">Rows per page</p>
           <Select
             value={limit.toString()}
             onValueChange={(value) => onLimitChange?.(Number.parseInt(value))}
@@ -207,7 +207,7 @@ export function DataTable<TData, TValue>({
           </Select>
         </div>
         <div className="flex items-center space-x-2">
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+          <div className="flex w-[100px] items-center justify-center font-medium text-sm">
             Page {page} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">

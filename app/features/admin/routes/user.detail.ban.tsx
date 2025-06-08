@@ -87,7 +87,7 @@ export default function UserBanPage() {
       <DialogContent>
         <DialogTitle>Ban User</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Ban {user.name} ({user.email}) from the platform
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function UserBanPage() {
             <Label htmlFor="banReason">Ban Reason</Label>
             <Input id="banReason" name="banReason" placeholder="Enter ban reason" required />
             {actionData?.fieldErrors?.banReason && (
-              <p className="text-sm text-destructive">{actionData.fieldErrors.banReason[0]}</p>
+              <p className="text-destructive text-sm">{actionData.fieldErrors.banReason[0]}</p>
             )}
           </div>
 
@@ -110,7 +110,7 @@ export default function UserBanPage() {
               min={new Date().toISOString().slice(0, 16)}
             />
             {actionData?.fieldErrors?.banExpires && (
-              <p className="text-sm text-destructive">{actionData.fieldErrors.banExpires[0]}</p>
+              <p className="text-destructive text-sm">{actionData.fieldErrors.banExpires[0]}</p>
             )}
           </div>
 

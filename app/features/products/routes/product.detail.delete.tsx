@@ -69,7 +69,7 @@ export default function ProductDelete() {
       <DialogContent>
         <DialogTitle>Delete Product</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to delete "{product.name}"? This action cannot be undone.
           </p>
         </div>

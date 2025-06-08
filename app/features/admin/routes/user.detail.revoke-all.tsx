@@ -56,7 +56,7 @@ export default function UserRevokeAllSessionsPage() {
       <DialogContent>
         <DialogTitle>Revoke All Sessions</DialogTitle>
         <div className="grid gap-2">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Are you sure you want to revoke all sessions for {user.name} ({user.email})? This will
             log them out of all devices.
           </p>

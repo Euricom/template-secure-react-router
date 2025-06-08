@@ -46,8 +46,8 @@ export function RecentSessions({ sessions, userId }: RecentSessionsProps) {
           {currentSessions.map((session) => (
             <div key={session.id} className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">{session.userAgent || "Unknown device"}</p>
-                <p className="text-xs text-muted-foreground">{formatDate(session.createdAt)}</p>
+                <p className="font-medium text-sm">{session.userAgent || "Unknown device"}</p>
+                <p className="text-muted-foreground text-xs">{formatDate(session.createdAt)}</p>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline">{session.ipAddress || "IP unknown"}</Badge>
@@ -61,7 +61,7 @@ export function RecentSessions({ sessions, userId }: RecentSessionsProps) {
 
         {totalPages > 1 && (
           <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-sm">
               Page {currentPage} of {totalPages}
             </div>
             <div className="flex gap-2">

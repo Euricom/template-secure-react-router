@@ -40,15 +40,15 @@ export default function ProductDetailPage() {
     <div className="container mx-auto px-4 py-8">
       <Header title="Product Details" />
 
-      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl">
+      <div className="max-w-2xl rounded-lg bg-white p-6 shadow-md">
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-semibold">{product.name}</h2>
+            <h2 className="font-semibold text-2xl">{product.name}</h2>
             <p className="text-gray-500 text-sm">ID: {product.id}</p>
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-medium">Timestamps</h3>
+            <h3 className="font-medium text-lg">Timestamps</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-500">Created</p>
@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="pt-4 flex gap-4">
+          <div className="flex gap-4 pt-4">
             <Button asChild variant="outline">
               <Link to="/app/products">Back to Products</Link>
             </Button>
