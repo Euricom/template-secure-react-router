@@ -1,30 +1,43 @@
-import type { LoaderFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, Params } from "react-router";
 import { z } from "zod";
+import type { StrictParams } from "./base";
 
 export type ValidationResult<T> =
   | { data: T; error?: never }
   | { data?: never; error: Error; fieldErrors?: Record<string, string[]> };
 
-export async function parseInputs(
+type ParseInputsResult<
+  P extends z.ZodSchema | undefined,
+  Q extends z.ZodSchema | undefined,
+  F extends z.ZodSchema | undefined,
+> = {
+  params: ValidationResult<P extends z.ZodSchema ? StrictParams<z.infer<P>> : null>;
+  query: ValidationResult<Q extends z.ZodSchema ? StrictParams<z.infer<Q>> : null>;
+  form: ValidationResult<F extends z.ZodSchema ? StrictParams<z.infer<F>> : null>;
+};
+
+export async function parseInputs<
+  P extends z.ZodSchema | undefined = undefined,
+  Q extends z.ZodSchema | undefined = undefined,
+  F extends z.ZodSchema | undefined = undefined,
+>(
   args: LoaderFunctionArgs,
-  paramSchema?: z.ZodSchema | undefined,
-  querySchema?: z.ZodSchema | undefined,
-  formSchema?: z.ZodSchema | undefined
-) {
+  paramSchema?: P,
+  querySchema?: Q,
+  formSchema?: F
+): Promise<ParseInputsResult<P, Q, F>> {
   const parsedParams = validateParams(args.params, paramSchema);
   const parsedQuery = validateQueryParams(new URL(args.request.url).searchParams, querySchema);
   const parsedForm = await validateFormData(args.request, formSchema);
   return { params: parsedParams, query: parsedQuery, form: parsedForm };
 }
 
-function validateParams(
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  params: any,
-  schema?: z.ZodSchema
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-): ValidationResult<any> {
+function validateParams<T extends z.ZodSchema | undefined>(
+  params: Params,
+  schema?: T
+): ValidationResult<T extends z.ZodSchema ? StrictParams<z.infer<T>> : null> {
   if (!schema) {
-    return { data: null };
+    return { data: null as T extends z.ZodSchema ? StrictParams<z.infer<T>> : null };
   }
 
   const parsed = schema.safeParse(params);
@@ -35,13 +48,13 @@ function validateParams(
   return { data: parsed.data };
 }
 
-function validateQueryParams(
+// TODO: use custom error
+function validateQueryParams<T extends z.ZodSchema | undefined>(
   searchParams: URLSearchParams,
-  schema?: z.ZodSchema
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-): ValidationResult<any> {
+  schema?: T
+): ValidationResult<T extends z.ZodSchema ? StrictParams<z.infer<T>> : null> {
   if (!schema) {
-    return { data: null };
+    return { data: null as T extends z.ZodSchema ? StrictParams<z.infer<T>> : null };
   }
 
   // Convert URLSearchParams to a plain object
@@ -58,30 +71,29 @@ function validateQueryParams(
   return { data: parsed.data };
 }
 
-async function validateFormData(
+async function validateFormData<T extends z.ZodSchema | undefined>(
   request: Request,
-  schema?: z.ZodSchema
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-): Promise<ValidationResult<any>> {
+  schema?: T
+): Promise<ValidationResult<T extends z.ZodSchema ? StrictParams<z.infer<T>> : null>> {
   if (!schema) {
-    return { data: null };
+    return { data: null as T extends z.ZodSchema ? StrictParams<z.infer<T>> : null };
   }
 
   // Check if the request has form data
   const contentType = request.headers.get("content-type") || "";
-  if (
-    !contentType.includes("application/x-www-form-urlencoded") &&
-    !contentType.includes("multipart/form-data")
-  ) {
-    return { data: null };
+  if (!contentType.includes("application/x-www-form-urlencoded")) {
+    return { data: null as T extends z.ZodSchema ? StrictParams<z.infer<T>> : null };
   }
 
   try {
     const formData = await request.formData();
-    const data: Record<string, string | File> = {};
+    const data: Record<string, string> = {};
 
     // Convert FormData to a plain object
     for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        throw new Error("File is not supported");
+      }
       data[key] = value;
     }
 

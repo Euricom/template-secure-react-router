@@ -22,8 +22,9 @@ The authorization system is built on several key components:
    - Server-side permission validation
    - Client-side permission checks
    - Type-safe permission handling
+   - Support for public routes
 
-> **Note**: For detailed information about protected routes and their implementation, please refer to the [Secure Routes Documentation](./secureroutes.md).
+> **Note**: For detailed information about protected routes and their implementation, including parameter validation, error handling, and best practices, please refer to the [Secure Routes Documentation](./secureroutes.md).
 
 ## Permission System
 
@@ -84,6 +85,45 @@ Permissions are defined using three main components:
    - Organization membership
    - Role requirements
 
+## Route Protection Levels
+
+The system supports three levels of route protection, as detailed in the [Secure Routes Documentation](./secureroutes.md):
+
+1. **Public Routes**
+   ```ts
+   export const loader = createPublicLoader({
+     permissions: "public",
+     function: async () => {
+       // Public data access
+     },
+   });
+   ```
+
+2. **Logged-in Routes**
+   ```ts
+   export const loader = createProtectedLoader({
+     permissions: "loggedIn",
+     function: async ({ identity }) => {
+       // Protected data access
+     },
+   });
+   ```
+
+3. **Permission-based Routes**
+   ```ts
+   export const loader = createProtectedLoader({
+     permissions: {
+       action: "read",
+       subject: "Organization",
+     },
+     function: async ({ identity }) => {
+       // Permission-checked data access
+     },
+   });
+   ```
+
+For more details on route protection, including parameter validation, form validation, and error handling, see the [Secure Routes Documentation](./secureroutes.md#key-features).
+
 ## Client-Side Authorization
 
 The client-side authorization is handled through a React context provider:
@@ -115,16 +155,27 @@ function MyComponent() {
 1. **Protecting Routes**
 
    ```ts
+   // Public route
+   export const loader = createPublicLoader({
+     permissions: "public",
+     function: async () => {
+       return { publicData: await getPublicData() };
+     },
+   });
+
+   // Protected route with specific permissions
    export const loader = createProtectedLoader({
      permissions: {
        action: "read",
        subject: "Organization",
      },
      function: async ({ identity }) => {
-       // Your loader logic
+       return { organization: identity.organization };
      },
    });
    ```
+
+   For more examples of route protection, including form handling and parameter validation, see the [Secure Routes Documentation](./secureroutes.md#usage-examples).
 
 2. **Checking Permissions in Components**
 
@@ -138,6 +189,25 @@ function MyComponent() {
    ```ts
    ensureCanWithIdentity(identity, "create", "Organization");
    ```
+
+## Best Practices
+
+1. **Use Appropriate Protection Level**
+   - Use "public" for truly public routes
+   - Use "loggedIn" for routes that only require authentication
+   - Use specific permission checks for fine-grained access control
+
+2. **Handle All Error Cases**
+   - Check for validation errors
+   - Provide meaningful error messages
+   - Include field-level errors for forms
+
+3. **Keep Functions Pure**
+   - Separate validation from business logic
+   - Use the provided type-safe parameters
+   - Handle all edge cases
+
+For more detailed best practices and implementation guidelines, refer to the [Secure Routes Documentation](./secureroutes.md#best-practices).
 
 ## Advanced CASL Usage
 

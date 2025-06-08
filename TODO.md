@@ -42,6 +42,7 @@
 
 - [ ] Global logging
   - Add in biome.json linter.rules.suspicious.noConsole: "error"
+  - Create custom errors
 
 -  Docs for AI
   - How to use a modal

@@ -74,7 +74,7 @@ interface ProtectedRouteContext {
 
 ### Using Organization Context with Secure Routes
 
-The secure routes system (`app/lib/secureRoute.ts`) provides type-safe access to organization context in both loaders and actions:
+The secure routes system provides type-safe access to organization context in both loaders and actions:
 
 ```typescript
 import { createProtectedLoader, createProtectedAction } from "~/lib/secureRoute";
@@ -82,10 +82,7 @@ import { z } from "zod";
 
 // Protected loader with organization context
 export const loader = createProtectedLoader({
-  permissions: {
-    action: "read",
-    subject: "Organization",
-  },
+  permissions: "loggedIn", // Basic authentication check
   function: async ({ identity }) => {
     // identity.organization is fully typed
     return {
@@ -95,7 +92,7 @@ export const loader = createProtectedLoader({
   },
 });
 
-// Protected action with organization context
+// Protected action with organization context and specific permissions
 export const action = createProtectedAction({
   permissions: {
     action: "update",
@@ -120,6 +117,14 @@ export const action = createProtectedAction({
     return { success: true };
   },
 });
+
+// Public loader example (e.g., for organization selection)
+export const publicLoader = createPublicLoader({
+  permissions: "public",
+  function: async () => {
+    return { organizations: await getPublicOrganizations() };
+  },
+});
 ```
 
 ### Best Practices
@@ -127,6 +132,7 @@ export const action = createProtectedAction({
 1. **Authorization Checks**
 
    - Use the secure routes system for all organization-related routes
+   - Choose appropriate protection level (public, loggedIn, or specific permissions)
    - Leverage the built-in permission system
    - Check organization roles when needed
 
@@ -135,10 +141,12 @@ export const action = createProtectedAction({
    - Use appropriate HTTP status codes
    - Provide clear error messages
    - Handle organization-specific errors
+   - Validate form data and parameters
 
 3. **Type Safety**
    - Use the provided type-safe context
    - Validate all parameters and form data
    - Leverage TypeScript for compile-time checks
+   - Use Zod for runtime validation
 
-For more detailed information about the secure routes system, refer to the [Secure Routes Documentation](./secureroutes.md).
+For more detailed information about the secure routes system, including parameter validation, form handling, and error management, refer to the [Secure Routes Documentation](./secureroutes.md).

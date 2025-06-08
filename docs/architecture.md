@@ -12,6 +12,7 @@ The project follows a modern React application architecture with a focus on secu
   - `/features` - Feature-specific components and logic
   - `/hooks` - Custom React hooks
   - `/lib` - Utility functions and shared code
+    - `/secureRoute` - Secure route implementation with type-safe validation
   - `entry.client.tsx` - Client-side entry point
   - `entry.server.tsx` - Server-side entry point
   - `root.tsx` - Root application component
@@ -35,8 +36,9 @@ The project follows a modern React application architecture with a focus on secu
 
 2. **Routing System**
 
-   - Secure route implementation, see [Secure Routes](./secureroutes.md)
-   - Protected routes with authentication checks, see [Secure Routes](./secureroutes.md)
+   - Type-safe secure route implementation, see [Secure Routes](./secureroutes.md)
+   - Public and protected routes with validation, see [Secure Routes](./secureroutes.md)
+   - Parameter and form validation, see [Secure Routes](./secureroutes.md)
 
 3. **Security Features**
 
@@ -44,7 +46,7 @@ The project follows a modern React application architecture with a focus on secu
    - CSRF protection
    - Session security, see [Authentication](./authentication.md)
    - Rate limiting
-   - Input validation
+   - Input validation with type safety
 
 4. **Database Layer**
    - PostgreSQL database

@@ -46,7 +46,7 @@ export function createPublicLoader<
       throw new Error("function is required");
     }
 
-    const { params, query } = await parseInputs(
+    const result = await parseInputs<P, Q, undefined>(
       args,
       config.paramValidation,
       config.queryValidation
@@ -55,8 +55,8 @@ export function createPublicLoader<
 
     return await config.function({
       ...rest,
-      params,
-      query,
+      params: result.params,
+      query: result.query,
     });
   };
 }
@@ -71,7 +71,7 @@ export function createProtectedLoader<
       throw new Error("function is required");
     }
 
-    const { params, query } = await parseInputs(
+    const result = await parseInputs<P, Q, undefined>(
       args,
       config.paramValidation,
       config.queryValidation
@@ -82,8 +82,8 @@ export function createProtectedLoader<
     return await config.function({
       ...rest,
       identity,
-      params,
-      query,
+      params: result.params,
+      query: result.query,
     });
   };
 }

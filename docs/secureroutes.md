@@ -4,10 +4,12 @@ The secure routes system provides a type-safe and secure way to handle route loa
 
 ## Overview
 
-The secure routes system (`app/lib/secureRoute.ts`) provides two main functions:
+The secure routes system provides four main functions:
 
-1. `createProtectedLoader`: For protecting route loaders
-2. `createProtectedAction`: For protecting route actions
+1. `createProtectedLoader`: For protecting route loaders that require authentication
+2. `createPublicLoader`: For public route loaders that don't require authentication
+3. `createProtectedAction`: For protecting route actions that require authentication
+4. `createPublicAction`: For public route actions that don't require authentication
 
 These functions wrap React Router's loader and action functions with additional security and validation layers.
 
@@ -16,12 +18,29 @@ These functions wrap React Router's loader and action functions with additional 
 ### 1. Permission Validation
 
 ```ts
+// Protected route with specific permissions
 export const loader = createProtectedLoader({
   permissions: {
     action: "read",
     subject: "Organization",
   },
   function: async ({ identity }) => {
+    // Your loader logic
+  },
+});
+
+// Protected route that only requires being logged in
+export const loader = createProtectedLoader({
+  permissions: "loggedIn",
+  function: async ({ identity }) => {
+    // Your loader logic
+  },
+});
+
+// Public route
+export const loader = createPublicLoader({
+  permissions: "public",
+  function: async () => {
     // Your loader logic
   },
 });
@@ -34,10 +53,13 @@ export const action = createProtectedAction({
   paramValidation: z.object({
     id: z.string(),
   }),
+  queryValidation: z.object({
+    filter: z.string().optional(),
+  }),
   formValidation: z.object({
     role: z.enum(["admin", "member", "owner"]),
   }),
-  function: async ({ params, form }) => {
+  function: async ({ params, query, form }) => {
     // Your action logic
   },
 });
@@ -51,18 +73,18 @@ The system is fully typed, providing:
 - Type-safe form data
 - Type-safe query parameters
 - Type-safe permission checks
+- Type-safe identity information
 
 ## Error Handling
 
 The system provides comprehensive error handling:
 
 1. **Permission Errors**
-
    - Throws clear error messages for unauthorized access
    - Includes user and organization context in errors
+   - Handles both public and protected routes appropriately
 
 2. **Validation Errors**
-
    - Parameter validation errors
    - Query parameter validation errors
    - Form data validation errors with field-level details
@@ -77,12 +99,9 @@ The system provides comprehensive error handling:
 
 ```ts
 export const loader = createProtectedLoader({
-  permissions: {
-    action: "read",
-    subject: "Organization",
-  },
+  permissions: "loggedIn",
   function: async ({ identity }) => {
-    return { organization: identity.organization };
+    return { user: identity.user };
   },
 });
 ```
@@ -98,7 +117,10 @@ export const loader = createProtectedLoader({
   paramValidation: z.object({
     userId: z.string(),
   }),
-  function: async ({ params }) => {
+  queryValidation: z.object({
+    include: z.string().optional(),
+  }),
+  function: async ({ params, query }) => {
     if (params.error) {
       throw new Response(params.error.message, { status: 400 });
     }
@@ -111,15 +133,12 @@ export const loader = createProtectedLoader({
 
 ```ts
 export const action = createProtectedAction({
-  permissions: {
-    action: "update",
-    subject: "User",
-  },
+  permissions: "loggedIn",
   formValidation: z.object({
     name: z.string().min(2),
     email: z.string().email(),
   }),
-  function: async ({ form }) => {
+  function: async ({ form, identity }) => {
     if (form.error) {
       return {
         success: false,
@@ -127,8 +146,19 @@ export const action = createProtectedAction({
         fieldErrors: form.fieldErrors,
       };
     }
-    await updateUser(form.data);
+    await updateUser(identity.user.id, form.data);
     return { success: true };
+  },
+});
+```
+
+### Public Route Example
+
+```ts
+export const loader = createPublicLoader({
+  permissions: "public",
+  function: async () => {
+    return { publicData: await getPublicData() };
   },
 });
 ```
@@ -136,22 +166,19 @@ export const action = createProtectedAction({
 ## Best Practices
 
 1. **Always Use Type Validation**
-
    - Define schemas for all parameters
    - Use Zod for runtime validation
    - Leverage TypeScript for compile-time checking
 
 2. **Handle All Error Cases**
-
    - Check for validation errors
    - Provide meaningful error messages
    - Include field-level errors for forms
 
-3. **Use Permission Checks**
-
-   - Define clear permission requirements
-   - Check permissions before data access
-   - Include organization context
+3. **Use Appropriate Permission Level**
+   - Use "public" for truly public routes
+   - Use "loggedIn" for routes that only require authentication
+   - Use specific permission checks for fine-grained access control
 
 4. **Keep Functions Pure**
    - Separate validation from business logic
