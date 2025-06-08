@@ -1,22 +1,21 @@
 import type { ActionFunctionArgs } from "react-router";
 import type { z } from "zod";
-import type { BaseConfig, StrictParams } from "./base";
+import type { BaseConfig } from "./base";
 import { type Identity, type PermissionCheck, validateIdentity } from "./identityCheck";
-import { type ValidationResult, parseInputs } from "./inputParsing";
+import { type ValidationResultOutput, parseInputs } from "./inputParsing";
 
 type BaseFunctionArgs<
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
   F extends z.ZodSchema | undefined = undefined,
 > = Omit<ActionFunctionArgs, "params"> & {
-  params: ValidationResult<P extends z.ZodSchema ? StrictParams<z.infer<P>> : null>;
-  query: ValidationResult<Q extends z.ZodSchema ? StrictParams<z.infer<Q>> : null>;
-  form: ValidationResult<F extends z.ZodSchema ? StrictParams<z.infer<F>> : null>;
+  params: ValidationResultOutput<P>;
+  query: ValidationResultOutput<Q>;
+  form: ValidationResultOutput<F>;
 };
 
 type PublicActionConfig<
-  // biome-ignore lint/suspicious/noExplicitAny: This is the response type of the loader, we cant know what it is
-  T = any,
+  T = unknown,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
   F extends z.ZodSchema | undefined = undefined,
@@ -27,75 +26,68 @@ type PublicActionConfig<
 };
 
 type ProtectedActionConfig<
-  // biome-ignore lint/suspicious/noExplicitAny: This is the response type of the loader, we cant know what it is
-  T = any,
+  T = unknown,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
   F extends z.ZodSchema | undefined = undefined,
 > = BaseConfig<P, Q> & {
   permissions: "loggedIn" | PermissionCheck;
   formValidation?: F extends z.ZodSchema ? F : undefined;
-  function: (
-    args: BaseFunctionArgs<P, Q, F> & {
-      identity: Identity;
-    }
-  ) => T;
+  function: (args: BaseFunctionArgs<P, Q, F> & { identity: Identity }) => T;
 };
 
-export function createPublicAction<
+async function createActionHandler<
   T,
-  P extends z.ZodSchema | undefined = undefined,
-  Q extends z.ZodSchema | undefined = undefined,
-  F extends z.ZodSchema | undefined = undefined,
->(config: PublicActionConfig<T, P, Q, F>) {
-  return async (args: ActionFunctionArgs) => {
-    if (!config.function) {
-      throw new Error("function is required");
-    }
+  P extends z.ZodSchema | undefined,
+  Q extends z.ZodSchema | undefined,
+  F extends z.ZodSchema | undefined,
+>(
+  config: PublicActionConfig<T, P, Q, F> | ProtectedActionConfig<T, P, Q, F>,
+  args: ActionFunctionArgs
+) {
+  const { params, query, form } = await parseInputs<P, Q, F>(
+    args,
+    config.paramValidation,
+    config.queryValidation,
+    config.formValidation
+  );
+  const { params: _, ...rest } = args;
 
-    const { params, query, form } = await parseInputs<P, Q, F>(
-      args,
-      config.paramValidation,
-      config.queryValidation,
-      config.formValidation
-    );
-    const { params: _, ...rest } = args;
-
-    return await config.function({
-      ...rest,
-      params,
-      query,
-      form,
-    });
+  const baseArgs = {
+    ...rest,
+    params,
+    query,
+    form,
   };
+
+  if (config.permissions === "public") {
+    return await config.function(baseArgs);
+  }
+
+  const identity = await validateIdentity(args.request, config.permissions);
+  return await config.function({ ...baseArgs, identity });
 }
 
-export function createProtectedAction<
-  T,
-  P extends z.ZodSchema | undefined = undefined,
-  Q extends z.ZodSchema | undefined = undefined,
-  F extends z.ZodSchema | undefined = undefined,
->(config: ProtectedActionConfig<T, P, Q, F>) {
-  return async (args: ActionFunctionArgs) => {
-    if (!config.function) {
-      throw new Error("function is required");
-    }
+export const createPublicAction =
+  <
+    T,
+    P extends z.ZodSchema | undefined = undefined,
+    Q extends z.ZodSchema | undefined = undefined,
+    F extends z.ZodSchema | undefined = undefined,
+  >(
+    config: PublicActionConfig<T, P, Q, F>
+  ) =>
+  (args: ActionFunctionArgs) =>
+    createActionHandler(config, args);
 
-    const { params, query, form } = await parseInputs<P, Q, F>(
-      args,
-      config.paramValidation,
-      config.queryValidation,
-      config.formValidation
-    );
-    const { params: _, ...rest } = args;
-    const identity = await validateIdentity(args.request, config.permissions);
-
-    return await config.function({
-      ...rest,
-      identity,
-      params,
-      query,
-      form,
-    });
-  };
-}
+export const createProtectedAction =
+  <
+    T,
+    P extends z.ZodSchema | undefined = undefined,
+    Q extends z.ZodSchema | undefined = undefined,
+    F extends z.ZodSchema | undefined = undefined,
+  >(
+    config: ProtectedActionConfig<T, P, Q, F>
+  ) =>
+  (args: ActionFunctionArgs) =>
+    createActionHandler(config, args);

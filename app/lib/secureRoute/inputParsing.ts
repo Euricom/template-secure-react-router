@@ -2,7 +2,20 @@ import type { LoaderFunctionArgs, Params } from "react-router";
 import { z } from "zod";
 import type { StrictParams } from "./base";
 
-export type ValidationResult<T> =
+const CONTENT_TYPES = {
+  FORM_URLENCODED: "application/x-www-form-urlencoded",
+} as const;
+
+const ERROR_MESSAGES = {
+  FILE_NOT_SUPPORTED: "File uploads are not supported",
+  FORM_PARSE_ERROR: "Failed to parse form data:",
+} as const;
+
+export type ValidationResultOutput<T> = ValidationResult<
+  T extends z.ZodSchema ? StrictParams<z.infer<T>> : null
+>;
+
+type ValidationResult<T> =
   | { data: T; error?: never }
   | { data?: never; error: Error; fieldErrors?: Record<string, string[]> };
 
@@ -81,7 +94,7 @@ async function validateFormData<T extends z.ZodSchema | undefined>(
 
   // Check if the request has form data
   const contentType = request.headers.get("content-type") || "";
-  if (!contentType.includes("application/x-www-form-urlencoded")) {
+  if (!contentType.includes(CONTENT_TYPES.FORM_URLENCODED)) {
     return { data: null as T extends z.ZodSchema ? StrictParams<z.infer<T>> : null };
   }
 
@@ -92,7 +105,7 @@ async function validateFormData<T extends z.ZodSchema | undefined>(
     // Convert FormData to a plain object
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
-        throw new Error("File is not supported");
+        throw new Error(ERROR_MESSAGES.FILE_NOT_SUPPORTED);
       }
       data[key] = value;
     }
@@ -120,14 +133,14 @@ async function validateFormData<T extends z.ZodSchema | undefined>(
       }
       return {
         error: new Error(
-          `Failed to parse form data: ${error instanceof Error ? error.message : String(error)}`
+          `${ERROR_MESSAGES.FORM_PARSE_ERROR} ${error instanceof Error ? error.message : String(error)}`
         ),
         fieldErrors: safeFieldErrors,
       };
     }
     return {
       error: new Error(
-        `Failed to parse form data: ${error instanceof Error ? error.message : String(error)}`
+        `${ERROR_MESSAGES.FORM_PARSE_ERROR} ${error instanceof Error ? error.message : String(error)}`
       ),
       fieldErrors: {},
     };
