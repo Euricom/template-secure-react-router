@@ -7,9 +7,11 @@ import { type ValidationResult, parseInputs } from "./inputParsing";
 type BaseFunctionArgs<
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
+  F extends z.ZodSchema | undefined = undefined,
 > = Omit<ActionFunctionArgs, "params"> & {
   params: ValidationResult<P extends z.ZodSchema ? StrictParams<z.infer<P>> : null>;
   query: ValidationResult<Q extends z.ZodSchema ? StrictParams<z.infer<Q>> : null>;
+  form: ValidationResult<F extends z.ZodSchema ? StrictParams<z.infer<F>> : null>;
 };
 
 type PublicActionConfig<
@@ -20,12 +22,8 @@ type PublicActionConfig<
   F extends z.ZodSchema | undefined = undefined,
 > = BaseConfig<P, Q> & {
   permissions: "public";
-  formValidation?: F;
-  function: (
-    args: BaseFunctionArgs<P, Q> & {
-      form: ValidationResult<F extends z.ZodSchema ? StrictParams<z.infer<F>> : null>;
-    }
-  ) => T;
+  formValidation?: F extends z.ZodSchema ? F : undefined;
+  function: (args: BaseFunctionArgs<P, Q, F>) => T;
 };
 
 type ProtectedActionConfig<
@@ -36,11 +34,10 @@ type ProtectedActionConfig<
   F extends z.ZodSchema | undefined = undefined,
 > = BaseConfig<P, Q> & {
   permissions: "loggedIn" | PermissionCheck;
-  formValidation?: F;
+  formValidation?: F extends z.ZodSchema ? F : undefined;
   function: (
-    args: BaseFunctionArgs<P, Q> & {
+    args: BaseFunctionArgs<P, Q, F> & {
       identity: Identity;
-      form: ValidationResult<F extends z.ZodSchema ? StrictParams<z.infer<F>> : null>;
     }
   ) => T;
 };
@@ -56,7 +53,7 @@ export function createPublicAction<
       throw new Error("function is required");
     }
 
-    const { params, query, form } = await parseInputs(
+    const { params, query, form } = await parseInputs<P, Q, F>(
       args,
       config.paramValidation,
       config.queryValidation,
@@ -84,7 +81,7 @@ export function createProtectedAction<
       throw new Error("function is required");
     }
 
-    const { params, query, form } = await parseInputs(
+    const { params, query, form } = await parseInputs<P, Q, F>(
       args,
       config.paramValidation,
       config.queryValidation,
