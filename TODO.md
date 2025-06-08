@@ -38,6 +38,9 @@
 - SEO
   https://github.com/forge-42/seo-tools
 
+- Localization
+  - https://github.com/forge-42/base-stack/blob/main/app/localization/i18n.server.ts
+
 - [ ] Global logging
   - Add in biome.json linter.rules.suspicious.noConsole: "error"
 
@@ -63,3 +66,5 @@ https://shadcnui-expansions.typeart.cc/
 
 https://github.com/forge-42
 https://github.com/forge-42/base-stack
+https://github.com/forge-42/remix-hook-form
+https://github.com/forge-42/remix-toast
