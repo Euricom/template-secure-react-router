@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const schema = z.object({
+const envSchema = z.object({
   NODE_ENV: z.enum(["production", "development", "test"] as const),
   DATABASE_URL: z.string(),
   BETTER_AUTH_URL: z.string(),
@@ -9,42 +9,57 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
 });
 
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends z.infer<typeof schema> {}
-  }
-}
+type ServerEnv = z.infer<typeof envSchema>;
+let env: ServerEnv;
 
-export function init() {
-  const parsed = schema.safeParse(process.env);
+/**
+ * Initializes and parses given environment variables using zod
+ * @returns Initialized env vars
+ */
+function initEnv() {
+  // biome-ignore lint/nursery/noProcessEnv: This should be the only place to use process.env directly
+  const envData = envSchema.safeParse(process.env);
 
-  if (parsed.success === false) {
-    console.error("❌ Invalid environment variables:", parsed.error.flatten().fieldErrors);
-
+  if (!envData.success) {
+    // biome-ignore lint/suspicious/noConsole: We want this to be logged
+    console.error("❌ Invalid environment variables:", envData.error.flatten().fieldErrors);
     throw new Error("Invalid environment variables");
   }
+
+  env = envData.data;
+  Object.freeze(env);
+
+  // Do not log the message when running tests
+  if (env.NODE_ENV !== "test") {
+    // biome-ignore lint/suspicious/noConsole: We want this to be logged
+    console.log("✅ Environment variables loaded successfully");
+  }
+  return env;
+}
+
+export function getServerEnv() {
+  if (env) return env;
+  return initEnv();
 }
 
 /**
- * This is used in both `entry.server.ts` and `root.tsx` to ensure that
- * the environment variables are set and globally available before the app is
- * started.
- *
- * NOTE: Do *not* add any environment variables in here that you do not wish to
- * be included in the client.
- * @returns all public ENV variables
+ * Helper function which returns a subset of the environment vars which are safe expose to the client.
+ * Dont expose any secrets or sensitive data here.
+ * Otherwise you would expose your server vars to the client if you returned them from here as this is
+ * directly sent in the root to the client and set on the window.env
+ * @returns Subset of the whole process.env to be passed to the client and used there
  */
-export function getEnv() {
+export function getClientEnv() {
+  const serverEnv = getServerEnv();
   return {
-    MODE: process.env.NODE_ENV,
+    NODE_ENV: serverEnv.NODE_ENV,
   };
 }
 
-type ENV = ReturnType<typeof getEnv>;
+type ClientEnvVars = ReturnType<typeof getClientEnv>;
 
 declare global {
-  let ENV: ENV;
   interface Window {
-    ENV: ENV;
+    env: ClientEnvVars;
   }
 }

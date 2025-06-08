@@ -15,7 +15,6 @@ import {
   type LoaderFunctionArgs,
   ServerRouter,
 } from "react-router";
-import { getEnv, init } from "./lib/env.server";
 import { NonceProvider } from "./lib/nonce-provider";
 
 const ABORT_DELAY = 5_000;
@@ -53,9 +52,6 @@ function setHeaders(responseHeaders: Headers, nonce: string) {
       .trim()
   );
 }
-
-init();
-global.ENV = getEnv();
 
 export default function handleRequest(
   request: Request,

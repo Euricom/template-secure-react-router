@@ -4,12 +4,12 @@ This document describes how environment variables are managed and validated in t
 
 ## Environment Variables
 
-The project uses Zod for runtime validation of environment variables, ensuring type safety and required values. The validation happens at application startup through the `init()` function in `env.server.ts`.
+The project uses Zod for runtime validation of environment variables, ensuring type safety and required values. The validation happens at application startup through the `initEnv()` function in `env.server.ts`.
 
 ### Required Environment Variables
 
 ```typescript
-const schema = z.object({
+const envSchema = z.object({
   NODE_ENV: z.enum(["production", "development", "test"] as const),
   DATABASE_URL: z.string(),
   BETTER_AUTH_URL: z.string(),
@@ -21,18 +21,14 @@ const schema = z.object({
 
 ## Validation
 
-Environment variables are validated using Zod schemas to ensure type safety and required values. The validation happens at application startup through the `init()` function.
+Environment variables are validated using Zod schemas to ensure type safety and required values. The validation happens at application startup through the `initEnv()` function.
 
 ### Type Safety
 
 The project uses TypeScript to ensure type safety of environment variables:
 
 ```typescript
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends z.infer<typeof schema> {}
-  }
-}
+type ServerEnv = z.infer<typeof envSchema>;
 ```
 
 This provides full type checking and autocompletion for environment variables throughout the application.
@@ -47,17 +43,18 @@ Environment variables that need to be accessible in the frontend are handled thr
 
 ### Implementation
 
-The `getEnv()` function in `env.server.ts` controls which environment variables are exposed to the client:
+The `getClientEnv()` function in `env.server.ts` controls which environment variables are exposed to the client:
 
 ```typescript
-export function getEnv() {
+export function getClientEnv() {
+  const serverEnv = getServerEnv();
   return {
-    MODE: process.env.NODE_ENV,
+    NODE_ENV: serverEnv.NODE_ENV,
   };
 }
 ```
 
-These variables are then made available to the client through the root loader and injected into the window object:
+These variables are then made available to the client through the root loader and injected into the window object with security measures:
 
 ```typescript
 // In root.tsx
@@ -74,12 +71,11 @@ These variables are then made available to the client through the root loader an
 The client-side environment variables are also typed:
 
 ```typescript
-type ENV = ReturnType<typeof getEnv>;
+type ClientEnvVars = ReturnType<typeof getClientEnv>;
 
 declare global {
-  let ENV: ENV;
   interface Window {
-    ENV: ENV;
+    env: ClientEnvVars;
   }
 }
 ```
@@ -87,15 +83,21 @@ declare global {
 ## Security Considerations
 
 - Only non-sensitive variables are exposed to the client
-- The `getEnv()` function explicitly controls which variables are available
+- The `getClientEnv()` function explicitly controls which variables are available
 - Script injection uses a nonce for additional security
 - Environment validation happens at application startup
+- Server-side environment variables are frozen after initialization
+- Environment variables are validated at startup with detailed error messages
+- Sensitive variables like database URLs and API secrets are kept server-side only
 
 ## Best Practices
 
-1. Always use the `getEnv()` function to expose variables to the client
+1. Always use the `getClientEnv()` function to expose variables to the client
 2. Keep sensitive variables server-side only
 3. Use TypeScript for type safety
 4. Validate all environment variables at startup
 5. Use meaningful variable names
 6. Document all required variables
+7. Use nonces for script injection
+8. Freeze environment variables after initialization
+9. Provide detailed error messages for invalid environment variables

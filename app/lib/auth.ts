@@ -27,6 +27,7 @@ import { PrismaClient } from "@prisma/client";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin, customSession, organization } from "better-auth/plugins";
+import { getServerEnv } from "./env.server";
 
 const prisma = new PrismaClient();
 
@@ -45,8 +46,8 @@ export const options = {
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: getServerEnv().GOOGLE_CLIENT_ID,
+      clientSecret: getServerEnv().GOOGLE_CLIENT_SECRET,
     },
   },
   emailVerification: {
@@ -83,7 +84,7 @@ export const options = {
       httpOnly: true, // SECURITY: Prevents JavaScript access to cookies
       sameSite: "lax" as const, // SECURITY: Prevents CSRF attacks
       partitioned: false, // Not enough browser support
-      prefix: process.env.NODE_ENV === "development" ? undefined : ("host" as const),
+      prefix: getServerEnv().NODE_ENV === "development" ? undefined : ("host" as const),
     },
   },
   plugins: [

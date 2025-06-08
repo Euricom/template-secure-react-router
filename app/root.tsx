@@ -14,7 +14,7 @@ import { PureAbility, buildMongoQueryMatcher } from "@casl/ability";
 import { packRules, unpackRules } from "@casl/ability/extra";
 import PermissionProvider from "./components/providers/permission.provider";
 import { auth } from "./lib/auth";
-import { getEnv } from "./lib/env.server";
+import { getClientEnv } from "./lib/env.server";
 import { useNonce } from "./lib/nonce-provider";
 import { ability } from "./lib/permissions.server";
 
@@ -25,7 +25,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const packRulesOutput = packRules(permissions.rules) ?? [];
 
-  return { session, packRulesOutput, ENV: getEnv() };
+  return { session, packRulesOutput, ENV: getClientEnv() };
 };
 
 export default function App() {
