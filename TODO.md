@@ -19,8 +19,14 @@
   - [ ] Honey pot
   - [ ] OWASP ASVS checklist
   - [ ] Sanitization/Serialization
+  - [ ] Logging of sensitive data access
+  - [ ] ?Data classification
+  - [ ] Secure route: add public version
+
 - Usability
   - [ ] Breadcrumbs
+  - [ ] 404 page
+  - [ ] Filterable table
 - Dev experience
   - [x] Dev tools
     - https://react-router-devtools.forge42.dev/
@@ -28,6 +34,14 @@
     - https://dane.computer/blogs/type-safe-environment-variables-in-remix
   - [x] Biome
     - https://biomejs.dev/
+
+- SEO
+  https://github.com/forge-42/seo-tools
+
+-  Docs for AI
+  - How to use a modal
+  - Naming of files .edit .delete
+  - Use of sonner
 
 # Some useful resources that can improve this project
 
@@ -42,3 +56,7 @@ https://github.com/mommyune/nextjs/tree/main/Session%20lookup
 
 
 https://shadcnui-expansions.typeart.cc/
+
+
+https://github.com/forge-42
+https://github.com/forge-42/base-stack
