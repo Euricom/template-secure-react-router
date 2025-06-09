@@ -3,6 +3,7 @@ import z from "zod";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { auth } from "~/lib/auth";
+import logger from "~/lib/logging/logger.server";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
@@ -13,7 +14,7 @@ export const action = createProtectedAction({
   paramValidation: z.object({
     inviteId: z.string(),
   }),
-  function: async ({ request, params }) => {
+  function: async ({ request, params, identity }) => {
     if (params.error) {
       return { error: "Failed to join organization" };
     }
@@ -52,7 +53,7 @@ export const action = createProtectedAction({
 
       return redirect("/app");
     } catch (error) {
-      console.error("error", error);
+      logger.error(identity, "Failed to join organization", { error });
       return { error: "Failed to join organization" };
     }
   },

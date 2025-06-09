@@ -28,6 +28,7 @@ import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin, customSession, organization } from "better-auth/plugins";
 import { getServerEnv } from "./env.server";
+import logger from "./logging/logger.server";
 
 const prisma = new PrismaClient();
 
@@ -39,9 +40,11 @@ export const options = {
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url, token }) => {
-      console.log("Sending reset password email to", user.email);
-      console.log("Reset password URL:", url);
-      console.log("Token:", token);
+      logger.info("system", "Sending reset password email", {
+        toAddress: user.email,
+        resetPasswordUrl: url,
+        token,
+      });
     },
   },
   socialProviders: {
@@ -53,26 +56,32 @@ export const options = {
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url, token }) => {
-      console.log("Sending verification email to", user.email);
-      console.log("Verification URL:", url);
-      console.log("Token:", token);
+      logger.info("system", "Sending verification email", {
+        toAddress: user.email,
+        verificationUrl: url,
+        token,
+      });
     },
   },
   user: {
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ user, url, token }) => {
-        console.log("Sending change email verification email to", user.email);
-        console.log("Verification URL:", url);
-        console.log("Token:", token);
+        logger.info("system", "Sending change email verification email", {
+          toAddress: user.email,
+          verificationUrl: url,
+          token,
+        });
       },
     },
     deleteUser: {
       enabled: true,
       sendDeleteAccountVerification: async ({ user, url, token }) => {
-        console.log("Sending delete account verification email to", user.email);
-        console.log("Verification URL:", url);
-        console.log("Token:", token);
+        logger.info("system", "Sending delete account verification email", {
+          toAddress: user.email,
+          verificationUrl: url,
+          token,
+        });
       },
     },
   },
@@ -96,10 +105,12 @@ export const options = {
         const invitedBy = data.inviter.user.name;
         const organizationName = data.organization.name;
 
-        console.log("Sending invitation email to", email);
-        console.log("Invite link:", inviteLink);
-        console.log("Invited by:", invitedBy);
-        console.log("Organization name:", organizationName);
+        logger.info("system", "Sending invitation email", {
+          toAddress: email,
+          inviteLink,
+          invitedBy,
+          organizationName,
+        });
       },
     }),
   ],

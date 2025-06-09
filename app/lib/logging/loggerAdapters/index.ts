@@ -29,7 +29,7 @@ export async function notifyAdapters(log: Record<string, unknown>) {
   if (errors.length > 0) {
     // Optionally, aggregate or rethrow errors, or log them elsewhere
     // For now, just log to console
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsole: Logger is not initialized yet
     console.error("Adapter notification errors:", errors);
   }
 }

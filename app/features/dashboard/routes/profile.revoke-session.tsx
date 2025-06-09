@@ -1,6 +1,7 @@
 import { redirect } from "react-router";
 import { z } from "zod";
 import { auth } from "~/lib/auth";
+import logger from "~/lib/logging/logger.server";
 import prisma from "~/lib/prismaClient";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
@@ -9,7 +10,7 @@ export const action = createProtectedAction({
   formValidation: z.object({
     sessionId: z.string(),
   }),
-  function: async ({ request, form }) => {
+  function: async ({ request, form, identity }) => {
     if (form.error) {
       return { success: false, error: "Failed to revoke session" };
     }
@@ -35,7 +36,7 @@ export const action = createProtectedAction({
       });
       return { success: true, message: "Session revoked successfully" };
     } catch (error) {
-      console.error("error", error);
+      logger.error(identity, "Failed to revoke session", { error });
       return { success: false, error: "Failed to revoke session" };
     }
   },

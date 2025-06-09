@@ -3,6 +3,7 @@ import { Form, Link, redirect, useLoaderData } from "react-router";
 import z from "zod";
 import { AlertDialog, AlertDialogContent, AlertDialogTitle } from "~/components/ui/alert-dialog";
 import { auth } from "~/lib/auth";
+import logger from "~/lib/logging/logger.server";
 import { createPublicAction, createPublicLoader } from "~/lib/secureRoute/";
 
 export const action = createPublicAction({
@@ -12,7 +13,9 @@ export const action = createPublicAction({
   }),
   function: async ({ request, form }) => {
     if (form.error) {
-      console.error(form.error);
+      logger.error("public", "Invalid form data during organization selection", {
+        error: form.error,
+      });
       return { error: "Invalid form data" };
     }
     const { organizationId } = form.data;

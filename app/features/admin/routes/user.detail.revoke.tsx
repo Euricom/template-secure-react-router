@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { DialogContent, DialogFooter, DialogTitle } from "~/components/ui/dialog";
 import { Dialog } from "~/components/ui/dialog";
 import { auth } from "~/lib/auth";
+import logger from "~/lib/logging/logger.server";
 import prisma from "~/lib/prismaClient";
 import { createProtectedAction } from "~/lib/secureRoute/";
 import type { OutletContext } from "./user.detail";
@@ -15,7 +16,7 @@ export const action = createProtectedAction({
   paramValidation: z.object({
     sessionId: z.string(),
   }),
-  function: async ({ request, params }) => {
+  function: async ({ request, params, identity }) => {
     if (params.error) {
       return { success: false, message: params.error.message };
     }
@@ -39,7 +40,7 @@ export const action = createProtectedAction({
 
       return { success: true, message: "Session revoked successfully" };
     } catch (error) {
-      console.error("error", error);
+      logger.error(identity, "Failed to revoke session", { error });
       return { success: false, error: "Failed to revoke session" };
     }
   },

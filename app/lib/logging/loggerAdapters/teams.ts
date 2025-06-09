@@ -8,8 +8,8 @@ let warned = false;
 export async function teamsAdapter(log: Record<string, unknown>) {
   if (!TEAMS_WEBHOOK_URL) {
     if (!warned) {
-      // eslint-disable-next-line no-console
-      console.warn("[logger] TEAMS_WEBHOOK_URL is not set. Teams adapter will not send logs.");
+      // biome-ignore lint/suspicious/noConsole: Logger is not initialized yet
+      console.log("[logger] TEAMS_WEBHOOK_URL is not set. Teams adapter will not send logs.");
       warned = true;
     }
     return;

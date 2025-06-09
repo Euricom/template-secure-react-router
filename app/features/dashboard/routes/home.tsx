@@ -5,12 +5,14 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { authClient } from "~/lib/auth-client";
 import { formatDate } from "~/lib/date";
+import logger from "~/lib/logging/logger.server";
 import prisma from "~/lib/prismaClient";
 import { createProtectedLoader } from "~/lib/secureRoute/";
 
 export const loader = createProtectedLoader({
   permissions: "loggedIn",
   function: async () => {
+    logger.info("system", "Home page loaded");
     const products = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
     });

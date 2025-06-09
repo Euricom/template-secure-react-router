@@ -10,8 +10,8 @@ let warned = false;
 export async function grafanaLokiAdapter(log: Record<string, unknown>) {
   if (!LOKI_ENDPOINT) {
     if (!warned) {
-      // eslint-disable-next-line no-console
-      console.warn("[logger] LOKI_ENDPOINT is not set. Grafana Loki adapter will not send logs.");
+      // biome-ignore lint/suspicious/noConsole: Logger is not initialized yet
+      console.log("[logger] LOKI_ENDPOINT is not set. Grafana Loki adapter will not send logs.");
       warned = true;
     }
     return;

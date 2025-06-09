@@ -12,8 +12,6 @@ import type { LogContext, LogIdentity, LogLevel } from "./types";
 
 const LOG_LEVEL = getServerEnv().LOG_LEVEL || "info";
 
-console.log("LOG_LEVEL", LOG_LEVEL);
-
 // Adapter registration based on env
 const ADAPTERS_MAP = {
   file: fileAdapter,
@@ -34,7 +32,7 @@ function registerEnvAdapters() {
     const adapter = ADAPTERS_MAP[key as keyof typeof ADAPTERS_MAP];
     if (adapter) registerAdapter(adapter);
     else {
-      // eslint-disable-next-line no-console
+      // biome-ignore lint/suspicious/noConsole: The logger is not initialized yet, so we can't use it
       console.warn(`[logger] Unknown adapter '${key}' in LOG_ADAPTERS`);
     }
   }
@@ -115,6 +113,11 @@ const logger: Logger = Object.fromEntries(
       logWithNotify(level, identity, msg, context),
   ])
 ) as Logger;
+
+logger.info("system", "Logger initialized", {
+  logLevel: LOG_LEVEL,
+  adapters: Object.keys(ADAPTERS_MAP).join(", "),
+});
 
 export default logger;
 export { formatIdentity };

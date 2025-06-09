@@ -28,7 +28,8 @@ function initEnv() {
   const envData = envSchema.safeParse(process.env);
 
   if (!envData.success) {
-    console.error("❌ Invalid environment variables:", envData.error.flatten().fieldErrors);
+    // biome-ignore lint/suspicious/noConsole: The logger is not initialized yet, so we can't use it
+    console.error("Invalid environment variables", envData.error.flatten().fieldErrors);
     throw new Error("Invalid environment variables");
   }
 
@@ -37,7 +38,10 @@ function initEnv() {
 
   // Do not log the message when running tests
   if (env.NODE_ENV !== "test") {
-    console.log("✅ Environment variables loaded successfully");
+    // biome-ignore lint/suspicious/noConsole: The logger is not initialized yet, so we can't use it
+    console.log("Environment variables loaded successfully", {
+      NODE_ENV: env.NODE_ENV,
+    });
   }
   return env;
 }

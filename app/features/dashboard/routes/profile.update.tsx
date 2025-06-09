@@ -1,6 +1,7 @@
 import { redirect } from "react-router";
 import z from "zod";
 import { auth } from "~/lib/auth";
+import logger from "~/lib/logging/logger.server";
 import { createProtectedAction, createProtectedLoader } from "~/lib/secureRoute/";
 
 export const action = createProtectedAction({
@@ -9,7 +10,7 @@ export const action = createProtectedAction({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Invalid email address"),
   }),
-  function: async ({ request, form }) => {
+  function: async ({ request, form, identity }) => {
     if (form.error) {
       return { success: false, error: "Failed to update profile" };
     }
@@ -43,7 +44,7 @@ export const action = createProtectedAction({
 
       return { success: true, message: "Profile updated successfully" };
     } catch (error) {
-      console.error("error", error);
+      logger.error(identity, "Failed to update profile", { error });
       return { success: false, error: "Failed to update profile" };
     }
   },

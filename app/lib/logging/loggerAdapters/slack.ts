@@ -8,8 +8,8 @@ let warned = false;
 export async function slackAdapter(log: Record<string, unknown>) {
   if (!SLACK_WEBHOOK_URL) {
     if (!warned) {
-      // eslint-disable-next-line no-console
-      console.warn("[logger] SLACK_WEBHOOK_URL is not set. Slack adapter will not send logs.");
+      // biome-ignore lint/suspicious/noConsole: Logger is not initialized yet
+      console.log("[logger] SLACK_WEBHOOK_URL is not set. Slack adapter will not send logs.");
       warned = true;
     }
     return;

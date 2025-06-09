@@ -8,7 +8,7 @@ let warned = false;
 export async function discordAdapter(log: Record<string, unknown>) {
   if (!DISCORD_WEBHOOK_URL) {
     if (!warned) {
-      // eslint-disable-next-line no-console
+      // biome-ignore lint/suspicious/noConsole: Logger is not initialized yet
       console.warn("[logger] DISCORD_WEBHOOK_URL is not set. Discord adapter will not send logs.");
       warned = true;
     }
