@@ -23,6 +23,7 @@ export type LogIdentity =
     }
   | "public"
   | "system"
+  | "user"
   | null
   | undefined;
 
@@ -31,7 +32,7 @@ export type LogContext = Record<string, unknown>;
 
 // Extracts identity info for logging (never includes email or sensitive fields)
 export function extractIdentityInfo(identity: LogIdentity): Record<string, unknown> {
-  if (!identity || identity === "public" || identity === "system")
+  if (!identity || identity === "public" || identity === "system" || identity === "user")
     return { identity: identity ?? "public" };
   if (typeof identity === "object") {
     if (identity.user && typeof identity.user === "object" && identity.user.id) {

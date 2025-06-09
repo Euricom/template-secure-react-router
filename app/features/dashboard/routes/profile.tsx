@@ -22,6 +22,7 @@ import { Separator } from "~/components/ui/separator";
 import { auth } from "~/lib/auth";
 import { authClient } from "~/lib/auth-client";
 import { formatDate } from "~/lib/date";
+import { useLogger } from "~/lib/logging/useLogger";
 import { createProtectedLoader } from "~/lib/secureRoute";
 
 type Session = {
@@ -61,6 +62,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionToRevoke, setSessionToRevoke] = useState<Session | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const logger = useLogger();
   // const actionData = useActionData<typeof action>();
 
   /* TODO: show a success toast */
@@ -252,7 +254,7 @@ export default function ProfilePage() {
                         }
                       );
                     } catch (error) {
-                      console.error("error", error);
+                      logger.error("user", "Failed to reset password", { error });
                       setError("An unexpected error occurred. Please try again.");
                       setIsResettingPassword(false);
                     }

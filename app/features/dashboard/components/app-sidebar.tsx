@@ -12,6 +12,7 @@ import {
   SidebarRail,
 } from "~/components/ui/sidebar";
 import { authClient } from "~/lib/auth-client";
+import { useLogger } from "~/lib/logging/useLogger";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
@@ -34,6 +35,8 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ user, navMain, impersonated, activeOrg, ...props }: AppSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const logger = useLogger();
+
   const updatedNavMain = navMain.map((item) => {
     // Check if the current pathname matches the item's URL exactly
     const isExactMatch = item.url === pathname;
@@ -65,7 +68,12 @@ export function AppSidebar({ user, navMain, impersonated, activeOrg, ...props }:
       await authClient.admin.stopImpersonating();
       navigate("/app");
     } catch (error) {
-      console.error("Failed to stop impersonation:", error);
+      logger.error("public", "Failed to stop impersonation", {
+        error,
+        user,
+        impersonated,
+        activeOrg,
+      });
     }
   };
 

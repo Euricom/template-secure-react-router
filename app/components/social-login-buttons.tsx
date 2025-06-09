@@ -3,11 +3,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { authClient } from "~/lib/auth-client";
+import { useLogger } from "~/lib/logging/useLogger";
 
 type SocialProvider = Parameters<typeof authClient.signIn.social>[0]["provider"];
 
 export function SocialLoginButtons() {
   const navigate = useNavigate();
+  const logger = useLogger();
   const [loading, setLoading] = useState<SocialProvider | null>(null);
 
   const handleSocialLogin = async (provider: SocialProvider) => {
@@ -20,13 +22,13 @@ export function SocialLoginButtons() {
             navigate("/app/profile");
           },
           onError: (ctx) => {
-            console.error("Social login error:", ctx.error);
+            logger.error("public", "Social login error:", ctx.error);
             setLoading(null);
           },
         }
       );
     } catch (error) {
-      console.error("Social login error:", error);
+      logger.error("public", "Social login error:", { error });
       setLoading(null);
     }
   };
