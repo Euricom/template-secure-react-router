@@ -19,6 +19,71 @@ const envSchema = z.object({
 });
 ```
 
+### LOG_LEVEL
+
+- **Type:** string (optional)
+- **Purpose:** Sets the minimum log level for backend logging. Controls which log messages are shown in the terminal and written to the log file.
+- **Possible values:** debug, info, notice, warning, error, critical, emergency
+- **Default:** info
+
+Example usage in your .env file:
+
+```
+LOG_LEVEL=debug
+```
+
+### SLACK_WEBHOOK_URL
+- **Type:** string (optional)
+- **Purpose:** If set, error and higher logs will be sent to this Slack webhook.
+- **Example:**
+```
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
+```
+
+### TEAMS_WEBHOOK_URL
+- **Type:** string (optional)
+- **Purpose:** If set, error and higher logs will be sent to this Microsoft Teams webhook.
+- **Example:**
+```
+TEAMS_WEBHOOK_URL=https://outlook.office.com/webhook/XXX/YYY/ZZZ
+```
+
+### DISCORD_WEBHOOK_URL
+- **Type:** string (optional)
+- **Purpose:** If set, error and higher logs will be sent to this Discord webhook.
+- **Example:**
+```
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/XXX/YYY
+```
+
+### LOG_ADAPTERS
+- **Type:** string (optional)
+- **Purpose:** Comma-separated list of logging adapters to enable. Controls which destinations logs are sent to.
+- **Possible values:** file, slack, teams, discord, loki, prettyConsoleError
+- **Default:** file,prettyConsoleError
+- **Example:**
+```
+LOG_ADAPTERS=file,slack,teams
+```
+
+### LOKI_ENDPOINT
+- **Type:** string (optional)
+- **Purpose:** If set, logs will be sent to this Grafana Loki endpoint.
+- **Default:** http://localhost:3100/loki/api/v1/push
+- **Example:**
+```
+LOKI_ENDPOINT=https://loki.example.com/loki/api/v1/push
+```
+
+### LOKI_LABELS
+- **Type:** string (optional, JSON)
+- **Purpose:** Custom labels for logs sent to Loki, as a JSON string.
+- **Default:** {"job":"app"}
+- **Example:**
+```
+LOKI_LABELS={"job":"my-app","env":"production"}
+```
+
 ## Validation
 
 Environment variables are validated using Zod schemas to ensure type safety and required values. The validation happens at application startup through the `initEnv()` function.

@@ -7,6 +7,13 @@ const envSchema = z.object({
   BETTER_AUTH_SECRET: z.string(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  LOG_LEVEL: z.string().optional(), // TODO: can we make this an enum?
+  LOG_ADAPTERS: z.string().optional(), // TODO: can we make this an enum?
+  SLACK_WEBHOOK_URL: z.string().optional(),
+  TEAMS_WEBHOOK_URL: z.string().optional(),
+  DISCORD_WEBHOOK_URL: z.string().optional(),
+  LOKI_ENDPOINT: z.string().optional(),
+  LOKI_LABELS: z.string().optional(),
 });
 
 type ServerEnv = z.infer<typeof envSchema>;

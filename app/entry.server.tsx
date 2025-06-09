@@ -15,6 +15,7 @@ import {
   type LoaderFunctionArgs,
   ServerRouter,
 } from "react-router";
+import logger from "./lib/logging/logger.server";
 import { NonceProvider } from "./lib/nonce-provider";
 
 const ABORT_DELAY = 5_000;
@@ -95,7 +96,7 @@ export default function handleRequest(
           // errors encountered during initial shell rendering since they'll
           // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
-            console.error(error);
+            logger.error("system", "Error in shell rendering", { error });
           }
         },
         nonce,
@@ -116,8 +117,8 @@ export function handleError(
     return;
   }
   if (error instanceof Error) {
-    console.error(error.stack);
+    logger.critical("system", "Error in handleError", { error });
   } else {
-    console.error(error);
+    logger.critical("system", "Error in handleError", { error });
   }
 }
