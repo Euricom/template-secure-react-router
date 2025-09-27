@@ -1,7 +1,11 @@
 import type { LoaderFunctionArgs } from "react-router";
 import type z from "zod";
+import type {
+  IdentityWithOrganization,
+  IdentityWithoutOrganization,
+} from "../identity.server";
 import type { BaseConfig } from "./base";
-import { type Identity, type PermissionCheck, validateIdentity } from "./identityCheck";
+import { type PermissionCheck, validateIdentity } from "./identityCheck";
 import { type ValidationResultOutput, parseInputs } from "./inputParsing";
 
 type BaseFunctionArgs<
@@ -25,16 +29,32 @@ type ProtectedLoaderConfig<
   T = unknown,
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
+  IncludeOrg extends boolean = true,
 > = BaseConfig<P, Q> & {
   permissions: "loggedIn" | PermissionCheck;
-  function: (args: BaseFunctionArgs<P, Q> & { identity: Identity }) => T;
+  options?: {
+    includeOrganization?: IncludeOrg;
+  };
+  function: (
+    args: BaseFunctionArgs<P, Q> & {
+      identity: IncludeOrg extends true
+        ? IdentityWithOrganization
+        : IdentityWithoutOrganization;
+    }
+  ) => T;
 };
 
 async function createLoaderHandler<
   T,
   P extends z.ZodSchema | undefined,
   Q extends z.ZodSchema | undefined,
->(config: PublicLoaderConfig<T, P, Q> | ProtectedLoaderConfig<T, P, Q>, args: LoaderFunctionArgs) {
+  IncludeOrg extends boolean = true,
+>(
+  config:
+    | PublicLoaderConfig<T, P, Q>
+    | ProtectedLoaderConfig<T, P, Q, IncludeOrg>,
+  args: LoaderFunctionArgs
+) {
   const result = await parseInputs<P, Q, undefined>(
     args,
     config.paramValidation,
@@ -52,20 +72,34 @@ async function createLoaderHandler<
     return await config.function(baseArgs);
   }
 
-  const identity = await validateIdentity(args.request, config.permissions);
-  return await config.function({ ...baseArgs, identity });
+  const includeOrganization = config.options?.includeOrganization ?? true;
+  const identity = await validateIdentity(args.request, config.permissions, {
+    includeOrganization,
+  });
+  return await config.function({ ...baseArgs, identity } as Parameters<
+    typeof config.function
+  >[0]);
 }
 
 export const createPublicLoader =
-  <T, P extends z.ZodSchema | undefined = undefined, Q extends z.ZodSchema | undefined = undefined>(
+  <
+    T,
+    P extends z.ZodSchema | undefined = undefined,
+    Q extends z.ZodSchema | undefined = undefined,
+  >(
     config: PublicLoaderConfig<T, P, Q>
   ) =>
   (args: LoaderFunctionArgs) =>
     createLoaderHandler(config, args);
 
 export const createProtectedLoader =
-  <T, P extends z.ZodSchema | undefined = undefined, Q extends z.ZodSchema | undefined = undefined>(
-    config: ProtectedLoaderConfig<T, P, Q>
+  <
+    T,
+    P extends z.ZodSchema | undefined = undefined,
+    Q extends z.ZodSchema | undefined = undefined,
+    IncludeOrg extends boolean = true,
+  >(
+    config: ProtectedLoaderConfig<T, P, Q, IncludeOrg>
   ) =>
   (args: LoaderFunctionArgs) =>
     createLoaderHandler(config, args);

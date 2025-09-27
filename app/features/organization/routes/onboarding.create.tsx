@@ -25,6 +25,9 @@ export const action = createProtectedAction({
   formValidation: z.object({
     name: z.string().min(1, "Name is required"),
   }),
+  options: {
+    includeOrganization: false,
+  },
   function: async ({ request, identity, form }) => {
     if (form.error) {
       return {
@@ -83,7 +86,9 @@ export default function OnboardingCreate() {
     <Card className="mx-auto w-full max-w-md">
       <CardHeader>
         <CardTitle>Create a new organization</CardTitle>
-        <CardDescription>Enter a name for your new organization.</CardDescription>
+        <CardDescription>
+          Enter a name for your new organization.
+        </CardDescription>
       </CardHeader>
       <form method="post" autoComplete="off">
         <CardContent className="space-y-4 py-4">
@@ -100,7 +105,9 @@ export default function OnboardingCreate() {
             {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
           {actionData?.error && (
-            <div className="text-center text-destructive text-sm">{actionData.error}</div>
+            <div className="text-center text-destructive text-sm">
+              {actionData.error}
+            </div>
           )}
         </CardFooter>
       </form>

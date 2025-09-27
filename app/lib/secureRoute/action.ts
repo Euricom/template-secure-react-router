@@ -1,7 +1,11 @@
 import type { ActionFunctionArgs } from "react-router";
 import type { z } from "zod";
+import type {
+  IdentityWithOrganization,
+  IdentityWithoutOrganization,
+} from "../identity.server";
 import type { BaseConfig } from "./base";
-import { type Identity, type PermissionCheck, validateIdentity } from "./identityCheck";
+import { type PermissionCheck, validateIdentity } from "./identityCheck";
 import { type ValidationResultOutput, parseInputs } from "./inputParsing";
 
 type BaseFunctionArgs<
@@ -30,10 +34,20 @@ type ProtectedActionConfig<
   P extends z.ZodSchema | undefined = undefined,
   Q extends z.ZodSchema | undefined = undefined,
   F extends z.ZodSchema | undefined = undefined,
+  IncludeOrg extends boolean = true,
 > = BaseConfig<P, Q> & {
   permissions: "loggedIn" | PermissionCheck;
   formValidation?: F extends z.ZodSchema ? F : undefined;
-  function: (args: BaseFunctionArgs<P, Q, F> & { identity: Identity }) => T;
+  options?: {
+    includeOrganization?: IncludeOrg;
+  };
+  function: (
+    args: BaseFunctionArgs<P, Q, F> & {
+      identity: IncludeOrg extends true
+        ? IdentityWithOrganization
+        : IdentityWithoutOrganization;
+    }
+  ) => T;
 };
 
 async function createActionHandler<
@@ -41,8 +55,11 @@ async function createActionHandler<
   P extends z.ZodSchema | undefined,
   Q extends z.ZodSchema | undefined,
   F extends z.ZodSchema | undefined,
+  IncludeOrg extends boolean = true,
 >(
-  config: PublicActionConfig<T, P, Q, F> | ProtectedActionConfig<T, P, Q, F>,
+  config:
+    | PublicActionConfig<T, P, Q, F>
+    | ProtectedActionConfig<T, P, Q, F, IncludeOrg>,
   args: ActionFunctionArgs
 ) {
   const { params, query, form } = await parseInputs<P, Q, F>(
@@ -64,8 +81,14 @@ async function createActionHandler<
     return await config.function(baseArgs);
   }
 
-  const identity = await validateIdentity(args.request, config.permissions);
-  return await config.function({ ...baseArgs, identity });
+  const includeOrganization = config.options?.includeOrganization ?? true;
+  const identity = await validateIdentity(args.request, config.permissions, {
+    includeOrganization,
+  });
+
+  return await config.function({ ...baseArgs, identity } as Parameters<
+    typeof config.function
+  >[0]);
 }
 
 export const createPublicAction =
@@ -86,8 +109,9 @@ export const createProtectedAction =
     P extends z.ZodSchema | undefined = undefined,
     Q extends z.ZodSchema | undefined = undefined,
     F extends z.ZodSchema | undefined = undefined,
+    IncludeOrg extends boolean = true,
   >(
-    config: ProtectedActionConfig<T, P, Q, F>
+    config: ProtectedActionConfig<T, P, Q, F, IncludeOrg>
   ) =>
   (args: ActionFunctionArgs) =>
     createActionHandler(config, args);

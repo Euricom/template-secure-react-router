@@ -1,4 +1,8 @@
-import { AbilityBuilder, type Subject, createMongoAbility } from "@casl/ability";
+import {
+  AbilityBuilder,
+  type Subject,
+  createMongoAbility,
+} from "@casl/ability";
 import type { getUserInformation } from "./identity.server";
 
 type UserType =
@@ -62,16 +66,24 @@ export const ensureCanWithIdentity = (
     throw new Error("User is not logged in");
   }
 
+  const organization =
+    "organization" in identity ? identity.organization : null;
+
   const abilityy = ability({
     id: identity.user.id,
     role: identity.user.role,
-    organizationId: identity.organization.id,
-    organizationRole: identity.organization.role,
+    organizationId: organization?.id ?? null,
+    organizationRole: organization?.role ?? null,
   });
 
   if (!abilityy.can(action, subject)) {
+    if (organization) {
+      throw new Error(
+        `User (${identity.user.id} - ${identity.user.role}) in organization (${organization.id} - ${organization.role})  does not have permission to perform this action: ${action} ${subject}`
+      );
+    }
     throw new Error(
-      `User (${identity.user.id} - ${identity.user.role}) in organization (${identity.organization.id} - ${identity.organization.role})  does not have permission to perform this action: ${action} ${subject}`
+      `User (${identity.user.id} - ${identity.user.role}) does not have permission to perform this action: ${action} ${subject}`
     );
   }
 };

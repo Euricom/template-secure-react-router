@@ -7,12 +7,48 @@ export const getSession = async (request: Request) => {
   return session;
 };
 
-export const getUserInformation = async (request: Request) => {
+type BaseIdentity = {
+  user: {
+    id: string;
+    role?: string | null;
+    [key: string]: unknown;
+  };
+  session: {
+    [key: string]: unknown;
+  };
+  member: {
+    id: string;
+    role: string;
+    [key: string]: unknown;
+  } | null;
+};
+
+export type IdentityWithOrganization = BaseIdentity & {
+  organization: {
+    id: string;
+    role: string;
+  };
+};
+
+export type IdentityWithoutOrganization = BaseIdentity;
+
+export const getUserInformation = async (
+  request: Request,
+  includeOrganization = true
+): Promise<IdentityWithOrganization | IdentityWithoutOrganization> => {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) throw new Response("Unauthorized", { status: 401 });
 
+  if (!includeOrganization) {
+    return {
+      user: session.user,
+      session: session,
+      member: null,
+    };
+  }
+
   const orgId = session.session.activeOrganizationId;
-  if (!orgId) throw new Response("No active organization", { status: 400 });
+  if (!orgId) throw new Response("No active organization", { status: 401 });
 
   const member = await prisma.member.findFirst({
     where: {
