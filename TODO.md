@@ -16,6 +16,7 @@
   - [ ] CSRF
   - [ ] Rate limiting
     - Better auth includes rate limiting https://www.better-auth.com/docs/concepts/rate-limit
+    - https://www.npmjs.com/package/rate-limiter-flexible
   - [ ] Honey pot
   - [ ] OWASP ASVS checklist
   - [ ] Sanitization/Serialization
@@ -68,3 +69,8 @@ https://github.com/forge-42
 https://github.com/forge-42/base-stack
 https://github.com/forge-42/remix-hook-form
 https://github.com/forge-42/remix-toast
+
+https://github.com/slippyex/data-guardian
+https://github.com/ajinabraham/nodejsscan
+https://www.npmjs.com/package/limits
+https://github.com/lirantal/anti-trojan-source
